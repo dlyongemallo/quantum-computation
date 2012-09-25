@@ -46,6 +46,17 @@ func NewQReg(width int, values ...int) *QReg {
 	return qreg
 }
 
+// Convenience constructor for a qubit, specified by its spherical coordinates 
+// on the Bloch sphere.
+func NewQubit(theta, phi float64) *QReg {
+        // |psi> = cos(theta/2) + e^{i phi}sin(theta/2)
+        t := complex(theta/2, 0)
+        p := complex(phi, 0)
+        qreg := &QReg{1, []complex128{cmplx.Cos(t),
+                cmplx.Exp(complex(0, 1) * p) * cmplx.Sin(t)}}
+        return qreg
+}
+
 // Accessor for the width of a QReg
 func (qreg *QReg) Width() int {
 	return qreg.width
