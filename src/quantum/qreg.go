@@ -102,7 +102,12 @@ func (qreg *QReg) Copy() *QReg {
 
 // Get the probability of observing a state
 func (qreg *QReg) StateProb(state int) float64 {
-	return cmplx.Abs(qreg.amplitudes[state] * qreg.amplitudes[state])
+        // TODO(davinci): Allow this to accept a series of binary values for
+        // specifying the state.
+        // The probability of observing a state is the square of the magnitude
+        // of the complex amplitude.
+        magnitude := cmplx.Abs(qreg.amplitudes[state])
+	return magnitude * magnitude
 }
 
 // Get the probability of observing a state for a specific bit

@@ -33,6 +33,13 @@ func verifyBasisState(qreg *QReg, basis int) bool {
         return qreg.amplitudes[basis] == complex(1, 0)
 }
 
+// Helper function to test that two probabilities are "close enough".
+func verifyProbability(expected, actual float64) bool {
+        threshold := 0.0000000001
+        delta := actual - expected
+        return (delta > -threshold) && (delta < threshold)
+}
+
 // Test the various forms of the constructor.
 func TestNewQReg(t *testing.T) {
         // Test constructor that takes in no initial values.
@@ -51,6 +58,23 @@ func TestNewQReg(t *testing.T) {
         qreg = NewQReg(5, 0, 1, 1, 0, 1)
         if !verifyBasisState(qreg, 13) {
                 t.Error("Expected |01101>.")
+        }
+}
+
+// Test that the correct values are computed for the probability of measuring
+// a basis state.
+func TestQRegStateProb(t *testing.T) {
+        // TODO(davinci): Add more tests.
+
+        // Test the |+i> state.
+        qreg := KetPlusI()
+        if !verifyProbability(float64(0.5), qreg.StateProb(0)) {
+                t.Errorf("Bad probability for state |+i> = %+f, want 0.5",
+                        qreg.StateProb(0))
+        }
+        if !verifyProbability(float64(0.5), qreg.StateProb(1)) {
+                t.Errorf("Bad probability for state |-i> = %+f, want 0.5",
+                        qreg.StateProb(1))
         }
 }
 
