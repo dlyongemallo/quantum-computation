@@ -46,6 +46,37 @@ func NewQReg(width int, values ...int) *QReg {
 	return qreg
 }
 
+// The eigenvectors of the Pauli matrices are defined here for convenience,
+// with the eigenvalue +1 vector first, followed by the eigenvalue -1 vector.
+// These are the eigenvectors of the Pauli Z matrix (and the standard basis
+// states for one qubit).
+func KetZero() *QReg {
+        // |0> = [1; 0]
+        return &QReg{1, []complex128{1, 0}}
+}
+func KetOne() *QReg {
+        // |1> = [0; 1]
+        return &QReg{1, []complex128{0, 1}}
+}
+// These are the eigenvectors of the Pauli X matrix.
+func KetPlus() *QReg {
+        // |+> = 1/sqrt{2}[1; 1]
+        return &QReg{1, []complex128{1/math.Sqrt2, 1/math.Sqrt2}}
+}
+func KetMinus() *QReg {
+        // |-> = 1/sqrt{2}[1; -1]
+        return &QReg{1, []complex128{1/math.Sqrt2, -1/math.Sqrt2}}
+}
+// These are the eigenvectors of the Pauli Y matrix.
+func KetPlusI() *QReg{
+        // |+i> = 1/sqrt{2}[1; i]
+        return &QReg{1, []complex128{1/math.Sqrt2, complex(0, 1/math.Sqrt2)}}
+}
+func KetMinusI() *QReg {
+        // |-i> = 1/sqrt{2}[1; -i]
+        return &QReg{1, []complex128{1/math.Sqrt2, complex(0, -1/math.Sqrt2)}}
+}
+
 // Convenience constructor for a qubit, specified by its spherical coordinates 
 // on the Bloch sphere.
 func NewQubit(theta, phi float64) *QReg {
