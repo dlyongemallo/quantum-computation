@@ -1,0 +1,13 @@
+== INSTALLATION ==
+
+make && make install
+
+== EXAMPLES ==
+
+make all-examples
+examples/deutsch/deutsch
+examples/deutsch-jozsa/deutsch-jozsa
+examples/grover/grover
+examples/random/random
+examples/shor/shor # doesn't work yet
+examples/simon/simon
