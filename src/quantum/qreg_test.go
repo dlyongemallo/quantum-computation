@@ -35,9 +35,9 @@ func verifyBasisState(qreg *QReg, basis int) bool {
 
 // Helper function to test that two probabilities are "close enough".
 func verifyProbability(expected, actual float64) bool {
-        threshold := 0.0000000001
-        delta := actual - expected
-        return (delta > -threshold) && (delta < threshold)
+	threshold := 0.0000000001
+	delta := actual - expected
+	return (delta > -threshold) && (delta < threshold)
 }
 
 // Test the various forms of the constructor.
@@ -64,18 +64,18 @@ func TestNewQReg(t *testing.T) {
 // Test that the correct values are computed for the probability of measuring
 // a basis state.
 func TestQRegStateProb(t *testing.T) {
-        // TODO(davinci): Add more tests.
+	// TODO(davinci): Add more tests.
 
-        // Test the |+> state.
-        qreg := KetPlus()
-        if !verifyProbability(float64(0.5), qreg.StateProb(0)) {
-                t.Errorf("Bad probability for state |+> = %+f, expected 0.5.",
-                        qreg.StateProb(0))
-        }
-        if !verifyProbability(float64(0.5), qreg.StateProb(1)) {
-                t.Errorf("Bad probability for state |-> = %+f, expected 0.5.",
-                        qreg.StateProb(1))
-        }
+	// Test the |+> state.
+	qreg := KetPlus()
+	if !verifyProbability(float64(0.5), qreg.StateProb(0)) {
+		t.Errorf("Bad probability for state |+> = %+f, expected 0.5.",
+			qreg.StateProb(0))
+	}
+	if !verifyProbability(float64(0.5), qreg.StateProb(1)) {
+		t.Errorf("Bad probability for state |-> = %+f, expected 0.5.",
+			qreg.StateProb(1))
+	}
 }
 
 func TestQRegBSet_1BitCollapsed(t *testing.T) {

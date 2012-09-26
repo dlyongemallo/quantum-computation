@@ -48,6 +48,42 @@ func NewQReg(width int, values ...int) *QReg {
 	return qreg
 }
 
+// Given a series of values, convert them into the label of a standard basis
+// for the quantum register. If no values are given, return the label of the
+// all-zero state |0...0>. If one value is given, interpret it as the integer
+// (decimal) representation of a basis state label. If a series of binary
+// values are given equal in number to width, interpret them as the binary
+// representation of such a label.
+func (qreg *QReg) basisStateLabel(values ...int) int {
+	if len(values) == 0 {
+		// The basis state is |0>.
+		return 0
+	} else if len(values) == 1 {
+		// Given integer d, the basis state is |d>.
+		if values[0] < 0 || values[0] >= len(qreg.amplitudes) {
+			errStr := fmt.Sprintf("The state |%d> is not "+
+				"possible for a register of width %d.",
+				values[0], qreg.width)
+			panic(errStr)
+		}
+		return values[0]
+	} else if len(values) == qreg.width {
+		// Given binary {b_1, b_2, ..., b_k}, the basis state is
+		// |b_1 b_2 ... b_k>.
+		label := 0
+		for _, value := range values {
+			label <<= 1
+			if value < 0 || value > 1 {
+				panic("Unexpected non-binary value in label " +
+					"of quantum register.")
+			}
+			label += value
+		}
+		return label
+	}
+	panic("Bad label for quantum register.")
+}
+
 // The eigenvectors of the Pauli matrices are defined here for convenience,
 // with the eigenvalue +1 vector first, followed by the eigenvalue -1 vector.
 // These are the eigenvectors of the Pauli Z matrix (and the standard basis
@@ -109,12 +145,11 @@ func (qreg *QReg) Copy() *QReg {
 }
 
 // Compute the probability of observing a state.
-func (qreg *QReg) StateProb(state int) float64 {
-        // TODO(davinci): Allow this to accept a series of binary values for
-        // specifying the state.
-        // The probability of observing a state is the square of the magnitude
-        // of the complex amplitude.
-        magnitude := cmplx.Abs(qreg.amplitudes[state])
+func (qreg *QReg) StateProb(values ...int) float64 {
+	label := qreg.basisStateLabel(values...)
+	// The probability of observing a state is the square of the magnitude
+	// of the complex amplitude.
+	magnitude := cmplx.Abs(qreg.amplitudes[label])
 	return magnitude * magnitude
 }
 
@@ -136,36 +171,8 @@ func (qreg *QReg) BProb(index int, value int) float64 {
 // interpret them as the binary representation of a basis state.
 func (qreg *QReg) Set(values ...int) {
 	// The Hilbert space has dimension math.Pow(2,width).
-	hilbertSpaceDim := 1 << uint(qreg.width)
-
-	qreg.amplitudes = make([]complex128, hilbertSpaceDim)
-	if len(values) == 0 {
-		// Set to |0...0>.
-		qreg.amplitudes[0] = 1
-	} else if len(values) == 1 {
-		// Given an integer d, set to basis state |d>.
-		if values[0] < 0 || values[0] >= hilbertSpaceDim {
-			errStr := fmt.Sprintf("Value of %d is too large for "+
-				"QReg of width %d.", values[0], qreg.width)
-			panic(errStr)
-		}
-		qreg.amplitudes[values[0]] = 1
-	} else if len(values) == qreg.width {
-		// Given binary b_1, b_2, ..., b_k, set to basis state
-		// |b_1 b_2 ... b_k>.
-		basisStateIndex := 0
-		for _, value := range values {
-			basisStateIndex <<= 1
-			if value < 0 || value > 1 {
-				panic("Expected 0 or 1 when setting value of " +
-					"quantum register.")
-			}
-			basisStateIndex += value
-		}
-		qreg.amplitudes[basisStateIndex] = 1
-	} else {
-		panic("Bad values for quantum register.")
-	}
+	qreg.amplitudes = make([]complex128, 1<<uint(qreg.width))
+	qreg.amplitudes[qreg.basisStateLabel(values...)] = 1
 }
 
 // Set a particular bit in a QReg
