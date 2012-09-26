@@ -19,12 +19,13 @@ package quantum
 
 import (
 	"math"
+	"math/cmplx"
 	"testing"
 )
 
 // Helper function for testing. Returns true if the amplitude for the given
 // basis state is set to 1, and all other amplitudes are set to 0.
-func verifyBasisState(qreg *QReg, basis int) bool {
+func isBasisState(qreg *QReg, basis int) bool {
 	for i, amplitude := range qreg.amplitudes {
 		if amplitude != complex(0, 0) && i != basis {
 			return false
@@ -34,7 +35,7 @@ func verifyBasisState(qreg *QReg, basis int) bool {
 }
 
 // Helper function to test that two probabilities are "close enough".
-func verifyProbability(expected, actual float64) bool {
+func verifyProb(expected, actual float64) bool {
 	threshold := 0.0000000001
 	delta := actual - expected
 	return (delta > -threshold) && (delta < threshold)
@@ -44,37 +45,55 @@ func verifyProbability(expected, actual float64) bool {
 func TestNewQReg(t *testing.T) {
 	// Test constructor that takes in no initial values.
 	qreg := NewQReg(4)
-	if !verifyBasisState(qreg, 0) {
+	if !isBasisState(qreg, 0) {
 		t.Error("Expected |0000>.")
 	}
 
 	// Test constructor that takes in integer representation of basis state.
 	qreg = NewQReg(8, 3)
-	if !verifyBasisState(qreg, 3) {
+	if !isBasisState(qreg, 3) {
 		t.Error("Expected |00000011>.")
 	}
 
 	// Test constructor that takes in binary representation of basis state.
 	qreg = NewQReg(5, 0, 1, 1, 0, 1)
-	if !verifyBasisState(qreg, 13) {
+	if !isBasisState(qreg, 13) {
 		t.Error("Expected |01101>.")
 	}
 }
 
-// Test that the correct values are computed for the probability of measuring
+// Test that the correct values are computed for the probability of observing
 // a basis state.
 func TestQRegStateProb(t *testing.T) {
 	// TODO(davinci): Add more tests.
 
 	// Test the |+> state.
 	qreg := KetPlus()
-	if !verifyProbability(float64(0.5), qreg.StateProb(0)) {
+	if !verifyProb(float64(0.5), qreg.StateProb(0)) {
 		t.Errorf("Bad probability for state |+> = %+f, expected 0.5.",
 			qreg.StateProb(0))
 	}
-	if !verifyProbability(float64(0.5), qreg.StateProb(1)) {
+	if !verifyProb(float64(0.5), qreg.StateProb(1)) {
 		t.Errorf("Bad probability for state |-> = %+f, expected 0.5.",
 			qreg.StateProb(1))
+	}
+}
+
+// Test that the correct values are computed for the probability of observing
+// a given bit.
+func TestQRegBProb(t *testing.T) {
+	qreg := NewQReg(2)
+	qreg.amplitudes = []complex128{
+		cmplx.Sqrt(0.1), // |00>
+		cmplx.Sqrt(0.2), // |01>
+		cmplx.Sqrt(0.3), // |10>
+		cmplx.Sqrt(0.4), // |10>
+	}
+	if !verifyProb(qreg.BProb(0, 0), 0.3) ||
+		!verifyProb(qreg.BProb(0, 1), 0.7) ||
+		!verifyProb(qreg.BProb(1, 0), 0.4) ||
+		!verifyProb(qreg.BProb(1, 1), 0.6) {
+		t.Errorf("Incorrect probability.")
 	}
 }
 
@@ -95,7 +114,7 @@ func TestQRegBSet_1BitEntangled(t *testing.T) {
 	qreg := NewQReg(2, 0)
 	qreg.amplitudes[0] = complex(1/math.Sqrt2, 0)
 	qreg.amplitudes[1] = complex(-1/math.Sqrt2, 0)
-	qreg.BSet(0, 1)
+	qreg.BSet(1, 1)
 	if qreg.amplitudes[0] != complex(0, 0) {
 		t.Errorf("Bad amplitude for state 0 = %+f, expected 0.",
 			qreg.amplitudes[0])

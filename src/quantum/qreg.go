@@ -48,6 +48,16 @@ func NewQReg(width int, values ...int) *QReg {
 	return qreg
 }
 
+// Set the QReg to a state in the standard basis. If no value is given, default
+// to the all zero state. If one value is given, interpret it as the integer
+// representation of a basis state. If a series of binary values are given,
+// interpret them as the binary representation of a basis state.
+func (qreg *QReg) Set(values ...int) {
+	// The Hilbert space has dimension math.Pow(2,width).
+	qreg.amplitudes = make([]complex128, 1<<uint(qreg.width))
+	qreg.amplitudes[qreg.basisStateLabel(values...)] = 1
+}
+
 // Given a series of values, convert them into the label of a standard basis
 // for the quantum register. If no values are given, return the label of the
 // all-zero state |0...0>. If one value is given, interpret it as the integer
@@ -144,7 +154,7 @@ func (qreg *QReg) Copy() *QReg {
 	return newQreg
 }
 
-// Compute the probability of observing a state.
+// Compute the probability of observing a basis state.
 func (qreg *QReg) StateProb(values ...int) float64 {
 	label := qreg.basisStateLabel(values...)
 	// The probability of observing a state is the square of the magnitude
@@ -156,23 +166,13 @@ func (qreg *QReg) StateProb(values ...int) float64 {
 // Compute the probability of observing a state for a specific bit.
 func (qreg *QReg) BProb(index int, value int) float64 {
 	prob := float64(0.0)
-	bit := 1 << uint(index)
-	bitnot := (1 - value) << uint(index)
+	bit := 1 << uint(qreg.width - 1 - index)
+	bitnot := (1 - value) << uint(qreg.width - 1 - index)
 	// Iterate through all the basis states where this bit is 1
 	for state := 0 | bit; state < len(qreg.amplitudes); state = (state + 1) | bit {
 		prob += qreg.StateProb(state - bitnot)
 	}
 	return prob
-}
-
-// Set the QReg to a state in the standard basis. If no value is given, default
-// to the all zero state. If one value is given, interpret it as the integer
-// representation of a basis state. If a series of binary values are given,
-// interpret them as the binary representation of a basis state.
-func (qreg *QReg) Set(values ...int) {
-	// The Hilbert space has dimension math.Pow(2,width).
-	qreg.amplitudes = make([]complex128, 1<<uint(qreg.width))
-	qreg.amplitudes[qreg.basisStateLabel(values...)] = 1
 }
 
 // Set a particular bit in a QReg
@@ -182,9 +182,9 @@ func (qreg *QReg) BSet(index int, value int) {
 			value)
 		panic(errStr)
 	}
-	bit := 1 << uint(index)
-	bitval := value << uint(index)
-	bitnot := (1 - value) << uint(index)
+	bit := 1 << uint(qreg.width - 1 - index)
+	bitval := value << uint(qreg.width - 1 - index)
+	bitnot := (1 - value) << uint(qreg.width - 1 - index)
 	bprob := qreg.BProb(index, value)
 	if bprob > 0 {
 		ampFactor := complex(1.0/math.Sqrt(bprob), 0)
