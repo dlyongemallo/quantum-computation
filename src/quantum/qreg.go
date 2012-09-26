@@ -97,9 +97,9 @@ func (qreg *QReg) Width() int {
 
 // Copy a quantum register
 func (qreg *QReg) Copy() *QReg {
-	new_qreg := &QReg{qreg.width, make([]complex128, len(qreg.amplitudes))}
-	copy(new_qreg.amplitudes, qreg.amplitudes)
-	return new_qreg
+	newQreg := &QReg{qreg.width, make([]complex128, len(qreg.amplitudes))}
+	copy(newQreg.amplitudes, qreg.amplitudes)
+	return newQreg
 }
 
 // Get the probability of observing a state
@@ -112,7 +112,7 @@ func (qreg *QReg) BProb(index int, value int) float64 {
 	prob := float64(0.0)
 	bit := 1 << uint(index)
 	bitnot := (1 - value) << uint(index)
-	// Iterate through all the amplitudes where this bit is 1
+	// Iterate through all the basis states where this bit is 1
 	for state := 0 | bit; state < len(qreg.amplitudes); state = (state + 1) | bit {
 		prob += qreg.StateProb(state - bitnot)
 	}
@@ -125,33 +125,33 @@ func (qreg *QReg) BProb(index int, value int) float64 {
 // interpret them as the binary representation of a basis state.
 func (qreg *QReg) Set(values ...int) {
 	// The Hilbert space has dimension math.Pow(2,width).
-	hilbert_space_dim := 1 << uint(qreg.width)
+	hilbertSpaceDim := 1 << uint(qreg.width)
 
-	qreg.amplitudes = make([]complex128, hilbert_space_dim)
+	qreg.amplitudes = make([]complex128, hilbertSpaceDim)
 	if len(values) == 0 {
 		// Set to |0...0>.
 		qreg.amplitudes[0] = 1
 	} else if len(values) == 1 {
 		// Given an integer d, set to basis state |d>.
-		if values[0] < 0 || values[0] >= hilbert_space_dim {
-			err_str := fmt.Sprintf("Value of %d is too large for "+
+		if values[0] < 0 || values[0] >= hilbertSpaceDim {
+			errStr := fmt.Sprintf("Value of %d is too large for "+
 				"QReg of width %d.", values[0], qreg.width)
-			panic(err_str)
+			panic(errStr)
 		}
 		qreg.amplitudes[values[0]] = 1
 	} else if len(values) == qreg.width {
 		// Given binary b_1, b_2, ..., b_k, set to basis state
 		// |b_1 b_2 ... b_k>.
-		basis_state_index := 0
+		basisStateIndex := 0
 		for _, value := range values {
-			basis_state_index <<= 1
+			basisStateIndex <<= 1
 			if value < 0 || value > 1 {
 				panic("Expected 0 or 1 when setting value of " +
 					"quantum register.")
 			}
-			basis_state_index += value
+			basisStateIndex += value
 		}
-		qreg.amplitudes[basis_state_index] = 1
+		qreg.amplitudes[basisStateIndex] = 1
 	} else {
 		panic("Bad values for quantum register.")
 	}
@@ -160,21 +160,21 @@ func (qreg *QReg) Set(values ...int) {
 // Set a particular bit in a QReg
 func (qreg *QReg) BSet(index int, value int) {
 	if value > 1 {
-		err_str := fmt.Sprintf("Value %d should be either 0 or 1",
+		errStr := fmt.Sprintf("Value %d should be either 0 or 1",
 			value)
-		panic(err_str)
+		panic(errStr)
 	}
 	bit := 1 << uint(index)
 	bitval := value << uint(index)
 	bitnot := (1 - value) << uint(index)
 	bprob := qreg.BProb(index, value)
 	if bprob > 0 {
-		amp_factor := complex(1.0/math.Sqrt(bprob), 0)
+		ampFactor := complex(1.0/math.Sqrt(bprob), 0)
 		// Alter every state.  If it's the right qubit value, fix the
 		// amplitude; otherwise, set the amplitude to 0.
 		for state, amp := range qreg.amplitudes {
 			if int(state)&bit == bitval {
-				qreg.amplitudes[state] = amp * amp_factor
+				qreg.amplitudes[state] = amp * ampFactor
 			} else {
 				qreg.amplitudes[state] = complex(0, 0)
 			}
@@ -183,10 +183,10 @@ func (qreg *QReg) BSet(index int, value int) {
 		// Iterate through all the amplitudes where this bit is 1
 		for state := int(0) | bit; state < int(len(qreg.amplitudes)); state = (state + 1) | bit {
 			// Add the amplitude of the old state to the new state
-			old_state := state - bitval
-			new_state := state - bitnot
-			qreg.amplitudes[new_state] += qreg.amplitudes[old_state]
-			qreg.amplitudes[old_state] = complex(0, 0)
+			oldState := state - bitval
+			newState := state - bitnot
+			qreg.amplitudes[newState] += qreg.amplitudes[oldState]
+			qreg.amplitudes[oldState] = complex(0, 0)
 		}
 	}
 }

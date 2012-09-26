@@ -91,11 +91,11 @@ func NewArrayGate(arr []complex128) *Gate {
 }
 
 func NewRealArrayGate(arr []float64) *Gate {
-	new_arr := make([]complex128, len(arr))
+	newArr := make([]complex128, len(arr))
 	for i, a := range arr {
-		new_arr[i] = complex(a, 0)
+		newArr[i] = complex(a, 0)
 	}
-	return NewArrayGate(new_arr)
+	return NewArrayGate(newArr)
 }
 
 func NewClassicalGate(f func(x int) int, bits int) *Gate {
@@ -108,24 +108,24 @@ func NewClassicalGate(f func(x int) int, bits int) *Gate {
 		bits)
 }
 
-func stateIndexForTarget(application int, target_value int, size int, targets []int) int {
-	state_vector := make([]int, size)
+func stateIndexForTarget(application int, targetValue int, size int, targets []int) int {
+	stateVector := make([]int, size)
 	for i := 0; i < size; i++ {
-		state_vector[i] = 2
+		stateVector[i] = 2
 	}
 	for i := 0; i < len(targets); i++ {
-		state_vector[targets[i]] = (target_value >> uint(i)) & 1
+		stateVector[targets[i]] = (targetValue >> uint(i)) & 1
 	}
-	app_pos := 0
+	appPos := 0
 	for i := 0; i < size; i++ {
-		if state_vector[i] == 2 {
-			state_vector[i] = (application >> uint(app_pos)) & 1
-			app_pos++
+		if stateVector[i] == 2 {
+			stateVector[i] = (application >> uint(appPos)) & 1
+			appPos++
 		}
 	}
 	index := 0
 	for i := 0; i < size; i++ {
-		index += state_vector[i] << uint(i)
+		index += stateVector[i] << uint(i)
 	}
 	return index
 }
@@ -156,11 +156,11 @@ func (gate *Gate) Apply(qreg *QReg, targets []int) {
 		}
 	}
 
-	num_apps := 1 << uint(qreg.width-len(targets))
-	new_states := make([]complex128, len(qreg.amplitudes))
+	numApps := 1 << uint(qreg.width-len(targets))
+	newAmplitudes := make([]complex128, len(qreg.amplitudes))
 	// Each application of the matrix
 	// app is the binary representation of the non-target states
-	for app := 0; app < num_apps; app++ {
+	for app := 0; app < numApps; app++ {
 		// Each row of the matrix
 		c := make(chan indexAmplitude)
 		for row := 0; row < gate.width(); row++ {
@@ -168,16 +168,16 @@ func (gate *Gate) Apply(qreg *QReg, targets []int) {
 		}
 		for row := 0; row < gate.width(); row++ {
 			ia := <-c
-			new_states[ia.index] = ia.amplitude
+			newAmplitudes[ia.index] = ia.amplitude
 		}
 	}
-	qreg.amplitudes = new_states
+	qreg.amplitudes = newAmplitudes
 }
 
-func (gate *Gate) ApplyRange(qreg *QReg, target_range_start int) {
+func (gate *Gate) ApplyRange(qreg *QReg, targetRangeStart int) {
 	targets := make([]int, gate.bits())
 	for i := 0; i < gate.bits(); i++ {
-		targets[i] = target_range_start + i
+		targets[i] = targetRangeStart + i
 	}
 	gate.Apply(qreg, targets)
 }
