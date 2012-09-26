@@ -47,10 +47,10 @@ func Hadamard(qreg *QReg, target int) {
 	NewHadamardGate(1).Apply(qreg, []int{target})
 }
 
-func HadamardRange(qreg *QReg, target_range_start int, target_range_end int) {
-	target_range_size := target_range_end - target_range_start
-	gate := NewHadamardGate(target_range_size)
-	gate.ApplyRange(qreg, target_range_start)
+func HadamardRange(qreg *QReg, targetRangeStart int, targetRangeEnd int) {
+	targetRangeSize := targetRangeEnd - targetRangeStart
+	gate := NewHadamardGate(targetRangeSize)
+	gate.ApplyRange(qreg, targetRangeStart)
 }
 
 func HadamardReg(qreg *QReg) {
@@ -75,10 +75,10 @@ func Diffusion(qreg *QReg, target int) {
 	NewDiffusionGate(1).Apply(qreg, []int{target})
 }
 
-func DiffusionRange(qreg *QReg, target_range_start int, target_range_end int) {
-	target_range_size := target_range_end - target_range_start
-	gate := NewDiffusionGate(target_range_size)
-	gate.ApplyRange(qreg, target_range_start)
+func DiffusionRange(qreg *QReg, targetRangeStart int, targetRangeEnd int) {
+	targetRangeSize := targetRangeEnd - targetRangeStart
+	gate := NewDiffusionGate(targetRangeSize)
+	gate.ApplyRange(qreg, targetRangeStart)
 }
 
 func DiffusionReg(qreg *QReg) {
