@@ -40,7 +40,7 @@ func isBasisState(qreg *QReg, basis int) bool {
 
 // Helper function to test that two probabilities are "close enough".
 func verifyProb(expected, actual float64) bool {
-	return math.Abs(actual - expected) < threshold
+	return math.Abs(actual-expected) < threshold
 }
 
 // Helper function to test that two complex amplitudes are "close enough".

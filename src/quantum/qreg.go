@@ -167,9 +167,9 @@ func (qreg *QReg) StateProb(values ...int) float64 {
 // individual bits of the register are indexed starting with 0 on the left
 // (i.e., most significant bit). A pair is returned corresponding to the
 // probabilities of observing 0 and 1, respectively.
-func (qreg *QReg) BProb(index int) [2]float64 {
+func (qreg *QReg) BProb(bitIndex int) [2]float64 {
 	prob := float64(0.0)
-	mask := 1 << uint(qreg.width - 1 - index)
+	mask := 1 << uint(qreg.width-1-bitIndex)
 	// Iterate through all the basis states where the indexed bit is 1, to
 	// sum the probability of observing 1 for that bit.
 	for label := 0 | mask; label < len(qreg.amplitudes); label = (label + 1) | mask {
@@ -179,16 +179,16 @@ func (qreg *QReg) BProb(index int) [2]float64 {
 }
 
 // Set a particular bit in a QReg
-func (qreg *QReg) BSet(index int, value int) {
+func (qreg *QReg) BSet(bitIndex int, value int) {
 	if value > 1 {
 		errStr := fmt.Sprintf("Value %d should be either 0 or 1",
 			value)
 		panic(errStr)
 	}
-	bit := 1 << uint(qreg.width - 1 - index)
-	bitval := value << uint(qreg.width - 1 - index)
-	bitnot := (1 - value) << uint(qreg.width - 1 - index)
-	bprob := qreg.BProb(index)[value]
+	bit := 1 << uint(qreg.width-1-bitIndex)
+	bitval := value << uint(qreg.width-1-bitIndex)
+	bitnot := (1 - value) << uint(qreg.width-1-bitIndex)
+	bprob := qreg.BProb(bitIndex)[value]
 	if bprob > 0 {
 		ampFactor := complex(1.0/math.Sqrt(bprob), 0)
 		// Alter every state.  If it's the right qubit value, fix the
@@ -213,17 +213,17 @@ func (qreg *QReg) BSet(index int, value int) {
 }
 
 // Measure a bit without collapsing its quantum state
-func (qreg *QReg) BMeasurePreserve(index int) int {
-	if rand.Float64() < qreg.BProb(index)[0] {
+func (qreg *QReg) BMeasurePreserve(bitIndex int) int {
+	if rand.Float64() < qreg.BProb(bitIndex)[0] {
 		return 0
 	}
 	return 1
 }
 
 // Measure a bit (the quantum state of this qubit will collapse)
-func (qreg *QReg) BMeasure(index int) int {
-	b := qreg.BMeasurePreserve(index)
-	qreg.BSet(index, b)
+func (qreg *QReg) BMeasure(bitIndex int) int {
+	b := qreg.BMeasurePreserve(bitIndex)
+	qreg.BSet(bitIndex, b)
 	return b
 }
 
@@ -256,16 +256,16 @@ func (qreg *QReg) Measure() int {
 	return value
 }
 
-func (qreg *QReg) PrintState(index int) {
-	prob := qreg.StateProb(index)
+func (qreg *QReg) PrintState(label int) {
+	prob := qreg.StateProb(label)
 	largest := (1 << uint(qreg.width)) - 1
 	padding := int(math.Floor(math.Log10(float64(largest)))) + 1
 	format := fmt.Sprintf("%%+f%%f|(%%%dd)%%0%db>", padding, qreg.width)
-	fmt.Printf(format, qreg.amplitudes[index], prob, index, index)
+	fmt.Printf(format, qreg.amplitudes[label], prob, label, label)
 }
 
-func (qreg *QReg) PrintStateln(index int) {
-	qreg.PrintState(index)
+func (qreg *QReg) PrintStateln(label int) {
+	qreg.PrintState(label)
 	fmt.Println()
 }
 
