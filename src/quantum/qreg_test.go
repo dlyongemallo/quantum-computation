@@ -23,6 +23,10 @@ import (
 	"testing"
 )
 
+// Threshold for how close two probabilities or complex amplitudes have to be
+// before they're considered equal.
+var threshold = 0.0000000001
+
 // Helper function for testing. Returns true if the amplitude for the given
 // basis state is set to 1, and all other amplitudes are set to 0.
 func isBasisState(qreg *QReg, basis int) bool {
@@ -36,9 +40,12 @@ func isBasisState(qreg *QReg, basis int) bool {
 
 // Helper function to test that two probabilities are "close enough".
 func verifyProb(expected, actual float64) bool {
-	threshold := 0.0000000001
-	delta := actual - expected
-	return (delta > -threshold) && (delta < threshold)
+	return math.Abs(actual - expected) < threshold
+}
+
+// Helper function to test that two complex amplitudes are "close enough".
+func verifyAmplitude(expected, actual complex128) bool {
+	return math.Abs(cmplx.Abs(actual)-cmplx.Abs(expected)) < threshold
 }
 
 // Test the various forms of the constructor.
@@ -89,10 +96,10 @@ func TestQRegBProb(t *testing.T) {
 		cmplx.Sqrt(0.3), // |10>
 		cmplx.Sqrt(0.4), // |10>
 	}
-	if !verifyProb(qreg.BProb(0, 0), 0.3) ||
-		!verifyProb(qreg.BProb(0, 1), 0.7) ||
-		!verifyProb(qreg.BProb(1, 0), 0.4) ||
-		!verifyProb(qreg.BProb(1, 1), 0.6) {
+	if !verifyProb(qreg.BProb(0)[0], 0.3) ||
+		!verifyProb(qreg.BProb(0)[1], 0.7) ||
+		!verifyProb(qreg.BProb(1)[0], 0.4) ||
+		!verifyProb(qreg.BProb(1)[1], 0.6) {
 		t.Errorf("Incorrect probability.")
 	}
 }
@@ -115,11 +122,11 @@ func TestQRegBSet_1BitEntangled(t *testing.T) {
 	qreg.amplitudes[0] = complex(1/math.Sqrt2, 0)
 	qreg.amplitudes[1] = complex(-1/math.Sqrt2, 0)
 	qreg.BSet(1, 1)
-	if qreg.amplitudes[0] != complex(0, 0) {
+	if !verifyAmplitude(complex(0, 0), qreg.amplitudes[0]) {
 		t.Errorf("Bad amplitude for state 0 = %+f, expected 0.",
 			qreg.amplitudes[0])
 	}
-	if qreg.amplitudes[1] != complex(-1, 0) {
+	if !verifyAmplitude(complex(-1, 0), qreg.amplitudes[1]) {
 		t.Errorf("Bad amplitude for state 1 = %+f, expected -1.",
 			qreg.amplitudes[1])
 	}

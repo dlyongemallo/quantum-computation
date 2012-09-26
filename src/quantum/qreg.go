@@ -163,16 +163,19 @@ func (qreg *QReg) StateProb(values ...int) float64 {
 	return magnitude * magnitude
 }
 
-// Compute the probability of observing a state for a specific bit.
-func (qreg *QReg) BProb(index int, value int) float64 {
+// Compute the probability of observing a specific bit for a basis state. The
+// individual bits of the register are indexed starting with 0 on the left
+// (i.e., most significant bit). A pair is returned corresponding to the
+// probabilities of observing 0 and 1, respectively.
+func (qreg *QReg) BProb(index int) [2]float64 {
 	prob := float64(0.0)
-	bit := 1 << uint(qreg.width - 1 - index)
-	bitnot := (1 - value) << uint(qreg.width - 1 - index)
-	// Iterate through all the basis states where this bit is 1
-	for state := 0 | bit; state < len(qreg.amplitudes); state = (state + 1) | bit {
-		prob += qreg.StateProb(state - bitnot)
+	mask := 1 << uint(qreg.width - 1 - index)
+	// Iterate through all the basis states where the indexed bit is 1, to
+	// sum the probability of observing 1 for that bit.
+	for label := 0 | mask; label < len(qreg.amplitudes); label = (label + 1) | mask {
+		prob += qreg.StateProb(label)
 	}
-	return prob
+	return [2]float64{1.0 - prob, prob}
 }
 
 // Set a particular bit in a QReg
@@ -185,7 +188,7 @@ func (qreg *QReg) BSet(index int, value int) {
 	bit := 1 << uint(qreg.width - 1 - index)
 	bitval := value << uint(qreg.width - 1 - index)
 	bitnot := (1 - value) << uint(qreg.width - 1 - index)
-	bprob := qreg.BProb(index, value)
+	bprob := qreg.BProb(index)[value]
 	if bprob > 0 {
 		ampFactor := complex(1.0/math.Sqrt(bprob), 0)
 		// Alter every state.  If it's the right qubit value, fix the
@@ -211,7 +214,7 @@ func (qreg *QReg) BSet(index int, value int) {
 
 // Measure a bit without collapsing its quantum state
 func (qreg *QReg) BMeasurePreserve(index int) int {
-	if rand.Float64() < qreg.BProb(index, 0) {
+	if rand.Float64() < qreg.BProb(index)[0] {
 		return 0
 	}
 	return 1
