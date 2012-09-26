@@ -29,7 +29,7 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-// Represents a quantum register
+// A QReg represents a quantum register.
 type QReg struct {
 	// The width (number of qubits) of this quantum register.
 	width int
@@ -39,7 +39,9 @@ type QReg struct {
 	amplitudes []complex128
 }
 
-// Constructor for a QReg
+// Constructor for a QReg of the given width. Optionally set its initial
+// value to a basis state, specified either as an integer or a series of
+// binary digits.
 func NewQReg(width int, values ...int) *QReg {
 	qreg := &QReg{width, nil}
 	qreg.Set(values...)
@@ -70,6 +72,9 @@ func KetMinus() *QReg {
 }
 
 // These are the eigenvectors of the Pauli Y matrix.
+// There is a bug in go1.0.2 which prevents these from being initialised to
+// the correct values if inlining is turned on.
+// See http://code.google.com/p/go/issues/detail?id=4159
 func KetPlusI() *QReg {
 	// |+i> = 1/sqrt{2}[1; i]
 	return &QReg{1, []complex128{1 / math.Sqrt2, complex(0, 1/math.Sqrt2)}}
@@ -81,7 +86,7 @@ func KetMinusI() *QReg {
 
 // Convenience constructor for a qubit, specified by its spherical coordinates
 // on the Bloch sphere.
-func NewQubit(theta, phi float64) *QReg {
+func NewQubitWithBlochCoords(theta, phi float64) *QReg {
 	// |psi> = cos(theta/2) + e^{i phi}sin(theta/2)
 	t := complex(theta/2, 0)
 	p := complex(phi, 0)
@@ -90,19 +95,20 @@ func NewQubit(theta, phi float64) *QReg {
 	return qreg
 }
 
-// Accessor for the width of a QReg
+// Accessor for the width of a QReg.
 func (qreg *QReg) Width() int {
 	return qreg.width
 }
 
-// Copy a quantum register
+// Copy a QReg, for testing purposes only. The no-cloning theorem of course
+// prevents copying an actual quantum register in an unknown arbitrary state.
 func (qreg *QReg) Copy() *QReg {
 	newQreg := &QReg{qreg.width, make([]complex128, len(qreg.amplitudes))}
 	copy(newQreg.amplitudes, qreg.amplitudes)
 	return newQreg
 }
 
-// Get the probability of observing a state
+// Compute the probability of observing a state.
 func (qreg *QReg) StateProb(state int) float64 {
         // TODO(davinci): Allow this to accept a series of binary values for
         // specifying the state.
@@ -112,7 +118,7 @@ func (qreg *QReg) StateProb(state int) float64 {
 	return magnitude * magnitude
 }
 
-// Get the probability of observing a state for a specific bit
+// Compute the probability of observing a state for a specific bit.
 func (qreg *QReg) BProb(index int, value int) float64 {
 	prob := float64(0.0)
 	bit := 1 << uint(index)
@@ -215,7 +221,7 @@ func (qreg *QReg) BMeasure(index int) int {
 func (qreg *QReg) MeasurePreserve() int {
 	r := rand.Float64()
 	sum := float64(0.0)
-	for i, _ := range qreg.amplitudes {
+	for i := range qreg.amplitudes {
 		sum += qreg.StateProb(i)
 		if r < sum {
 			return i
@@ -233,7 +239,7 @@ func (qreg *QReg) Measure() int {
 	} else {
 		amp = complex(-1, 0)
 	}
-	for i, _ := range qreg.amplitudes {
+	for i := range qreg.amplitudes {
 		qreg.amplitudes[i] = complex(0, 0)
 	}
 	qreg.amplitudes[value] = amp
@@ -254,14 +260,14 @@ func (qreg *QReg) PrintStateln(index int) {
 }
 
 func (qreg *QReg) Print() {
-	for i, _ := range qreg.amplitudes {
+	for i := range qreg.amplitudes {
 		qreg.PrintStateln(i)
 	}
 }
 
 func (qreg *QReg) PrintNonZero() {
-	for i, state := range qreg.amplitudes {
-		if state != 0 {
+	for i, amplitude := range qreg.amplitudes {
+		if amplitude != 0 {
 			qreg.PrintStateln(i)
 		}
 	}

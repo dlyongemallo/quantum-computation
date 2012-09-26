@@ -66,14 +66,14 @@ func TestNewQReg(t *testing.T) {
 func TestQRegStateProb(t *testing.T) {
         // TODO(davinci): Add more tests.
 
-        // Test the |+i> state.
-        qreg := KetPlusI()
+        // Test the |+> state.
+        qreg := KetPlus()
         if !verifyProbability(float64(0.5), qreg.StateProb(0)) {
-                t.Errorf("Bad probability for state |+i> = %+f, want 0.5",
+                t.Errorf("Bad probability for state |+> = %+f, expected 0.5.",
                         qreg.StateProb(0))
         }
         if !verifyProbability(float64(0.5), qreg.StateProb(1)) {
-                t.Errorf("Bad probability for state |-i> = %+f, want 0.5",
+                t.Errorf("Bad probability for state |-> = %+f, expected 0.5.",
                         qreg.StateProb(1))
         }
 }
@@ -82,11 +82,11 @@ func TestQRegBSet_1BitCollapsed(t *testing.T) {
 	qreg := NewQReg(1, 0)
 	qreg.BSet(0, 1)
 	if qreg.amplitudes[0] != complex(0, 0) {
-		t.Errorf("Bad amplitude for state 0 = %+f, want 0",
+		t.Errorf("Bad amplitude for state 0 = %+f, expected 0.",
 			qreg.amplitudes[0])
 	}
 	if qreg.amplitudes[1] != complex(1, 0) {
-		t.Errorf("Bad amplitude for state 1 = %+f, want 1",
+		t.Errorf("Bad amplitude for state 1 = %+f, expected 1.",
 			qreg.amplitudes[1])
 	}
 }
@@ -97,11 +97,11 @@ func TestQRegBSet_1BitEntangled(t *testing.T) {
 	qreg.amplitudes[1] = complex(-1/math.Sqrt2, 0)
 	qreg.BSet(0, 1)
 	if qreg.amplitudes[0] != complex(0, 0) {
-		t.Errorf("Bad amplitude for state 0 = %+f, want 0",
+		t.Errorf("Bad amplitude for state 0 = %+f, expected 0.",
 			qreg.amplitudes[0])
 	}
 	if qreg.amplitudes[1] != complex(-1, 0) {
-		t.Errorf("Bad amplitude for state 1 = %+f, want -1",
+		t.Errorf("Bad amplitude for state 1 = %+f, expected -1.",
 			qreg.amplitudes[1])
 	}
 }
