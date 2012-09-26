@@ -74,7 +74,6 @@ func NewFuncGateNoCheck(f func(row int, col int) complex128, bits int) *Gate {
 		}}
 }
 
-
 func NewFuncGate(f func(row int, col int) complex128, bits int) *Gate {
 	gate := NewFuncGateNoCheck(f, bits)
 	if !gate.IsUnitary() {

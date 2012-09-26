@@ -20,7 +20,7 @@ package quantum
 import (
 	"fmt"
 	"math"
-        "math/cmplx"
+	"math/cmplx"
 	"math/rand"
 	"time"
 )
@@ -31,11 +31,11 @@ func init() {
 
 // Represents a quantum register
 type QReg struct {
-        // The width (number of qubits) of this quantum register.
-	width      int
+	// The width (number of qubits) of this quantum register.
+	width int
 
-        // The complex amplitudes for each of the standard basis states.
-        // There are math.Pow(2,width) of these.
+	// The complex amplitudes for each of the standard basis states.
+	// There are math.Pow(2,width) of these.
 	amplitudes []complex128
 }
 
@@ -51,41 +51,43 @@ func NewQReg(width int, values ...int) *QReg {
 // These are the eigenvectors of the Pauli Z matrix (and the standard basis
 // states for one qubit).
 func KetZero() *QReg {
-        // |0> = [1; 0]
-        return &QReg{1, []complex128{1, 0}}
+	// |0> = [1; 0]
+	return &QReg{1, []complex128{1, 0}}
 }
 func KetOne() *QReg {
-        // |1> = [0; 1]
-        return &QReg{1, []complex128{0, 1}}
-}
-// These are the eigenvectors of the Pauli X matrix.
-func KetPlus() *QReg {
-        // |+> = 1/sqrt{2}[1; 1]
-        return &QReg{1, []complex128{1/math.Sqrt2, 1/math.Sqrt2}}
-}
-func KetMinus() *QReg {
-        // |-> = 1/sqrt{2}[1; -1]
-        return &QReg{1, []complex128{1/math.Sqrt2, -1/math.Sqrt2}}
-}
-// These are the eigenvectors of the Pauli Y matrix.
-func KetPlusI() *QReg{
-        // |+i> = 1/sqrt{2}[1; i]
-        return &QReg{1, []complex128{1/math.Sqrt2, complex(0, 1/math.Sqrt2)}}
-}
-func KetMinusI() *QReg {
-        // |-i> = 1/sqrt{2}[1; -i]
-        return &QReg{1, []complex128{1/math.Sqrt2, complex(0, -1/math.Sqrt2)}}
+	// |1> = [0; 1]
+	return &QReg{1, []complex128{0, 1}}
 }
 
-// Convenience constructor for a qubit, specified by its spherical coordinates 
+// These are the eigenvectors of the Pauli X matrix.
+func KetPlus() *QReg {
+	// |+> = 1/sqrt{2}[1; 1]
+	return &QReg{1, []complex128{1 / math.Sqrt2, 1 / math.Sqrt2}}
+}
+func KetMinus() *QReg {
+	// |-> = 1/sqrt{2}[1; -1]
+	return &QReg{1, []complex128{1 / math.Sqrt2, -1 / math.Sqrt2}}
+}
+
+// These are the eigenvectors of the Pauli Y matrix.
+func KetPlusI() *QReg {
+	// |+i> = 1/sqrt{2}[1; i]
+	return &QReg{1, []complex128{1 / math.Sqrt2, complex(0, 1/math.Sqrt2)}}
+}
+func KetMinusI() *QReg {
+	// |-i> = 1/sqrt{2}[1; -i]
+	return &QReg{1, []complex128{1 / math.Sqrt2, complex(0, -1/math.Sqrt2)}}
+}
+
+// Convenience constructor for a qubit, specified by its spherical coordinates
 // on the Bloch sphere.
 func NewQubit(theta, phi float64) *QReg {
-        // |psi> = cos(theta/2) + e^{i phi}sin(theta/2)
-        t := complex(theta/2, 0)
-        p := complex(phi, 0)
-        qreg := &QReg{1, []complex128{cmplx.Cos(t),
-                cmplx.Exp(complex(0, 1) * p) * cmplx.Sin(t)}}
-        return qreg
+	// |psi> = cos(theta/2) + e^{i phi}sin(theta/2)
+	t := complex(theta/2, 0)
+	p := complex(phi, 0)
+	qreg := &QReg{1, []complex128{cmplx.Cos(t),
+		cmplx.Exp(complex(0, 1)*p) * cmplx.Sin(t)}}
+	return qreg
 }
 
 // Accessor for the width of a QReg
@@ -122,37 +124,37 @@ func (qreg *QReg) BProb(index int, value int) float64 {
 // representation of a basis state. If a series of binary values are given,
 // interpret them as the binary representation of a basis state.
 func (qreg *QReg) Set(values ...int) {
-        // The Hilbert space has dimension math.Pow(2,width).
-        hilbert_space_dim := 1<<uint(qreg.width)
+	// The Hilbert space has dimension math.Pow(2,width).
+	hilbert_space_dim := 1 << uint(qreg.width)
 
-        qreg.amplitudes = make([]complex128, hilbert_space_dim)
-        if len(values) == 0 {
-                // Set to |0...0>.
-                qreg.amplitudes[0] = 1
-        } else if len(values) == 1 {
-                // Given an integer d, set to basis state |d>.
-                if values[0] < 0 || values[0] >= hilbert_space_dim {
-                        err_str := fmt.Sprintf("Value of %d is too large for " +
-                                "QReg of width %d.", values[0], qreg.width)
-                        panic(err_str)
-                }
-                qreg.amplitudes[values[0]] = 1
-        } else if len(values) == qreg.width {
-                // Given binary b_1, b_2, ..., b_k, set to basis state
-                // |b_1 b_2 ... b_k>.
-                basis_state_index := 0
-                for _, value := range values {
-                        basis_state_index <<= 1
-                        if value < 0 || value > 1 {
-                                panic("Expected 0 or 1 when setting value of " +
-                                        "quantum register.")
-                        }
-                        basis_state_index += value
-                }
-                qreg.amplitudes[basis_state_index] = 1
-        } else {
-                panic("Bad values for quantum register.")
-        }
+	qreg.amplitudes = make([]complex128, hilbert_space_dim)
+	if len(values) == 0 {
+		// Set to |0...0>.
+		qreg.amplitudes[0] = 1
+	} else if len(values) == 1 {
+		// Given an integer d, set to basis state |d>.
+		if values[0] < 0 || values[0] >= hilbert_space_dim {
+			err_str := fmt.Sprintf("Value of %d is too large for "+
+				"QReg of width %d.", values[0], qreg.width)
+			panic(err_str)
+		}
+		qreg.amplitudes[values[0]] = 1
+	} else if len(values) == qreg.width {
+		// Given binary b_1, b_2, ..., b_k, set to basis state
+		// |b_1 b_2 ... b_k>.
+		basis_state_index := 0
+		for _, value := range values {
+			basis_state_index <<= 1
+			if value < 0 || value > 1 {
+				panic("Expected 0 or 1 when setting value of " +
+					"quantum register.")
+			}
+			basis_state_index += value
+		}
+		qreg.amplitudes[basis_state_index] = 1
+	} else {
+		panic("Bad values for quantum register.")
+	}
 }
 
 // Set a particular bit in a QReg
