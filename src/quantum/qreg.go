@@ -178,14 +178,14 @@ func (qreg *QReg) BProb(bitIndex int) [2]float64 {
 	return [2]float64{1.0 - prob, prob}
 }
 
-// Set a particular bit in a QReg
+// Set a particular bit in a QReg. For testing purposes only.
 func (qreg *QReg) BSet(bitIndex int, value int) {
-	if value > 1 {
-		errStr := fmt.Sprintf("Value %d should be either 0 or 1",
+	if value < 0 || value > 1 {
+		errStr := fmt.Sprintf("Value %d should be either 0 or 1.",
 			value)
 		panic(errStr)
 	}
-	bit := 1 << uint(qreg.width-1-bitIndex)
+	mask := 1 << uint(qreg.width-1-bitIndex)
 	bitval := value << uint(qreg.width-1-bitIndex)
 	bitnot := (1 - value) << uint(qreg.width-1-bitIndex)
 	bprob := qreg.BProb(bitIndex)[value]
@@ -193,26 +193,27 @@ func (qreg *QReg) BSet(bitIndex int, value int) {
 		ampFactor := complex(1.0/math.Sqrt(bprob), 0)
 		// Alter every state.  If it's the right qubit value, fix the
 		// amplitude; otherwise, set the amplitude to 0.
-		for state, amp := range qreg.amplitudes {
-			if int(state)&bit == bitval {
-				qreg.amplitudes[state] = amp * ampFactor
+		for label, amp := range qreg.amplitudes {
+			if int(label)&mask == bitval {
+				qreg.amplitudes[label] = amp * ampFactor
 			} else {
-				qreg.amplitudes[state] = complex(0, 0)
+				qreg.amplitudes[label] = complex(0, 0)
 			}
 		}
 	} else {
 		// Iterate through all the amplitudes where this bit is 1
-		for state := int(0) | bit; state < int(len(qreg.amplitudes)); state = (state + 1) | bit {
-			// Add the amplitude of the old state to the new state
-			oldState := state - bitval
-			newState := state - bitnot
-			qreg.amplitudes[newState] += qreg.amplitudes[oldState]
-			qreg.amplitudes[oldState] = complex(0, 0)
+		for label := int(0) | mask; label < int(len(qreg.amplitudes)); label = (label + 1) | mask {
+			// Add the amplitude of the old label to the new label
+			oldLabel := label - bitval
+			newLabel := label - bitnot
+			qreg.amplitudes[newLabel] += qreg.amplitudes[oldLabel]
+			qreg.amplitudes[oldLabel] = complex(0, 0)
 		}
 	}
 }
 
-// Measure a bit without collapsing its quantum state
+// Simulate a measurement on a bit, i.e., get the result of the measurement
+// but without collapsing its quantum state.
 func (qreg *QReg) BMeasurePreserve(bitIndex int) int {
 	if rand.Float64() < qreg.BProb(bitIndex)[0] {
 		return 0
@@ -220,7 +221,7 @@ func (qreg *QReg) BMeasurePreserve(bitIndex int) int {
 	return 1
 }
 
-// Measure a bit (the quantum state of this qubit will collapse)
+// Measure a bit (the quantum state of this qubit will collapse).
 func (qreg *QReg) BMeasure(bitIndex int) int {
 	b := qreg.BMeasurePreserve(bitIndex)
 	qreg.BSet(bitIndex, b)
