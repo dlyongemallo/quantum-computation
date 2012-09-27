@@ -169,43 +169,50 @@ func (qreg *QReg) StateProb(values ...int) float64 {
 // probabilities of observing 0 and 1, respectively.
 func (qreg *QReg) BProb(bitIndex int) [2]float64 {
 	prob := float64(0.0)
-	mask := 1 << uint(qreg.width-1-bitIndex)
+	bitMask := 1 << uint(qreg.width-1-bitIndex)
 	// Iterate through all the basis states where the indexed bit is 1, to
 	// sum the probability of observing 1 for that bit.
-	for label := 0 | mask; label < len(qreg.amplitudes); label = (label + 1) | mask {
+	for label := 0 | bitMask; label < len(qreg.amplitudes); label = (label + 1) | bitMask {
 		prob += qreg.StateProb(label)
 	}
 	return [2]float64{1.0 - prob, prob}
 }
 
-// Set a particular bit in a QReg. For testing purposes only.
+// Set a particular bit in a QReg. This should normally not be called directly,
+// except for testing purposes, since it is not a physically realistic operation.
 func (qreg *QReg) BSet(bitIndex int, value int) {
 	if value < 0 || value > 1 {
 		errStr := fmt.Sprintf("Value %d should be either 0 or 1.",
 			value)
 		panic(errStr)
 	}
-	mask := 1 << uint(qreg.width-1-bitIndex)
-	bitval := value << uint(qreg.width-1-bitIndex)
-	bitnot := (1 - value) << uint(qreg.width-1-bitIndex)
+	bitMask := 1 << uint(qreg.width-1-bitIndex)
+	valueMask := value << uint(qreg.width-1-bitIndex)
 	bprob := qreg.BProb(bitIndex)[value]
 	if bprob > 0 {
-		ampFactor := complex(1.0/math.Sqrt(bprob), 0)
-		// Alter every state.  If it's the right qubit value, fix the
-		// amplitude; otherwise, set the amplitude to 0.
-		for label, amp := range qreg.amplitudes {
-			if int(label)&mask == bitval {
-				qreg.amplitudes[label] = amp * ampFactor
+		// Go through the amplitudes associated with each basis state
+		// label. If it has the bit set to the right value, scale the
+		// amplitude appropriately; otherwise, set the amplitude to 0.
+		newDenominator := complex(math.Sqrt(bprob), 0)
+		for label := range qreg.amplitudes {
+			amplitude := &qreg.amplitudes[label]
+			if label&bitMask == valueMask {
+				*amplitude /= newDenominator
 			} else {
-				qreg.amplitudes[label] = complex(0, 0)
+				*amplitude = complex(0, 0)
 			}
 		}
 	} else {
-		// Iterate through all the amplitudes where this bit is 1
-		for label := int(0) | mask; label < int(len(qreg.amplitudes)); label = (label + 1) | mask {
+		// This case should never happen. If the probability of reading the
+		// given bit value is 0, this should result in an error.
+		// TODO(davinci): Investigate why it is here, and if possible remove it.
+
+		// Iterate through all the basis states where this bit is 1
+	        notValueMask := (1 - value) << uint(qreg.width-1-bitIndex)
+		for label := 0 | bitMask; label < len(qreg.amplitudes); label = (label + 1) | bitMask {
 			// Add the amplitude of the old label to the new label
-			oldLabel := label - bitval
-			newLabel := label - bitnot
+			oldLabel := label - valueMask
+			newLabel := label - notValueMask
 			qreg.amplitudes[newLabel] += qreg.amplitudes[oldLabel]
 			qreg.amplitudes[oldLabel] = complex(0, 0)
 		}
@@ -228,20 +235,21 @@ func (qreg *QReg) BMeasure(bitIndex int) int {
 	return b
 }
 
-// Measure a register without collapsing its quantum state
+// Simulate a measurement on a register, i.e., get the result of the measurement
+// bit without collapsing its quantum state.
 func (qreg *QReg) MeasurePreserve() int {
 	r := rand.Float64()
 	sum := float64(0.0)
-	for i := range qreg.amplitudes {
-		sum += qreg.StateProb(i)
+	for label := range qreg.amplitudes {
+		sum += qreg.StateProb(label)
 		if r < sum {
-			return i
+			return label
 		}
 	}
 	return len(qreg.amplitudes) - 1
 }
 
-// Measure a register
+// Measure a register.
 func (qreg *QReg) Measure() int {
 	value := qreg.MeasurePreserve()
 	var amp complex128

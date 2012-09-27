@@ -25,7 +25,7 @@ import (
 
 // Threshold for how close two probabilities or complex amplitudes have to be
 // before they're considered equal.
-var threshold = 0.0000000001
+const threshold = 0.0000000001
 
 // Helper function for testing. Returns true if the amplitude for the given
 // basis state is set to 1, and all other amplitudes are set to 0.
