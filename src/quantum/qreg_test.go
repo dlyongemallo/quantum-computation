@@ -96,11 +96,25 @@ func TestQRegBProb(t *testing.T) {
 		cmplx.Sqrt(0.3), // |10>
 		cmplx.Sqrt(0.4), // |10>
 	}
-	if !verifyProb(qreg.BProb(0)[0], 0.3) ||
-		!verifyProb(qreg.BProb(0)[1], 0.7) ||
-		!verifyProb(qreg.BProb(1)[0], 0.4) ||
-		!verifyProb(qreg.BProb(1)[1], 0.6) {
-		t.Errorf("Incorrect probability.")
+
+	// |00> and |01>
+	if !verifyProb(qreg.BProb(0)[0], 0.3) {
+		t.Errorf("Bad probability for |0?>, expected 0.3.")
+	}
+
+	// |10> and |11>
+	if !verifyProb(qreg.BProb(0)[1], 0.7) {
+		t.Errorf("Bad probability for |1?>, expected 0.7.")
+	}
+
+	// |00> and |10>
+	if !verifyProb(qreg.BProb(1)[0], 0.4) {
+		t.Errorf("Bad probability for |?0>, expected 0.4.")
+	}
+
+	// |01> and |11>
+	if !verifyProb(qreg.BProb(1)[1], 0.6) {
+		t.Errorf("Bad probability for |?1>, expected 0.6.")
 	}
 }
 
