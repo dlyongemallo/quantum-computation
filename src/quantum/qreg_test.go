@@ -145,3 +145,7 @@ func TestQRegBSet_1BitEntangled(t *testing.T) {
 			qreg.amplitudes[1])
 	}
 }
+
+func TestQRegMeasure(t *testing.T) {
+	// TODO(davinci): Add tests here.
+}

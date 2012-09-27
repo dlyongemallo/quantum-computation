@@ -208,7 +208,7 @@ func (qreg *QReg) BSet(bitIndex int, value int) {
 		// TODO(davinci): Investigate why it is here, and if possible remove it.
 
 		// Iterate through all the basis states where this bit is 1
-	        notValueMask := (1 - value) << uint(qreg.width-1-bitIndex)
+		notValueMask := (1 - value) << uint(qreg.width-1-bitIndex)
 		for label := 0 | bitMask; label < len(qreg.amplitudes); label = (label + 1) | bitMask {
 			// Add the amplitude of the old label to the new label
 			oldLabel := label - valueMask
@@ -251,18 +251,18 @@ func (qreg *QReg) MeasurePreserve() int {
 
 // Measure a register.
 func (qreg *QReg) Measure() int {
-	value := qreg.MeasurePreserve()
-	var amp complex128
-	if real(qreg.amplitudes[value]) > 0 {
-		amp = complex(1, 0)
-	} else {
-		amp = complex(-1, 0)
+	outputLabel := qreg.MeasurePreserve()
+
+	// We rescale the amplitude corresponding to the output basis state so
+	// that its probability is 1. However, we preserve the (global) phase,
+	// since the register may be a subsystem in a larger system.
+	amplitude := qreg.amplitudes[outputLabel]
+	amplitude /= complex(cmplx.Abs(amplitude), 0)
+	for label := range qreg.amplitudes {
+		qreg.amplitudes[label] = complex(0, 0)
 	}
-	for i := range qreg.amplitudes {
-		qreg.amplitudes[i] = complex(0, 0)
-	}
-	qreg.amplitudes[value] = amp
-	return value
+	qreg.amplitudes[outputLabel] = amplitude
+	return outputLabel
 }
 
 func (qreg *QReg) PrintState(label int) {
