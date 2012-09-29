@@ -27,8 +27,14 @@ func closeEnough(a complex128, b complex128) bool {
 }
 
 type Gate struct {
+	// The matrix elements of the gate.
 	get   func(row int, col int) complex128
+
+	// The dimension of the Hilbert space.
+	// This is equal to math.Pow(2, "bits").
 	width func() int
+	
+	// The width of the gate (number of qubits).
 	bits  func() int
 }
 
@@ -66,9 +72,14 @@ func (gate *Gate) IsUnitary() bool {
 }
 
 func NewFuncGateNoCheck(f func(row int, col int) complex128, bits int) *Gate {
-	return &Gate{f, func() int {
-		return 1 << uint(bits)
-	},
+	return &Gate{
+		// get(row, col)
+		f,
+		// width()
+		func() int {
+			return 1 << uint(bits)
+		},
+		// bits()
 		func() int {
 			return bits
 		}}
@@ -84,9 +95,12 @@ func NewFuncGate(f func(row int, col int) complex128, bits int) *Gate {
 
 func NewArrayGate(arr []complex128) *Gate {
 	width := int(math.Sqrt(float64(len(arr))))
-	return NewFuncGate(func(row int, col int) complex128 {
-		return arr[row*width+col]
-	},
+	return NewFuncGate(
+		// get(row, col)
+		func(row int, col int) complex128 {
+			return arr[row*width+col]
+		},
+		// bits()
 		int(math.Log2(float64(width))))
 }
 

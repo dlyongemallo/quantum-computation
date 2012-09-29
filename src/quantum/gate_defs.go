@@ -29,17 +29,20 @@ func NewHadamardGate(bits int) *Gate {
 	}
 	p := complex(1.0/d, 0)
 	n := -p
-	return NewFuncGateNoCheck(func(row int, col int) complex128 {
-		// Calculate (-1)**<i,j> / sqrt(2**n)
-		par := 0
-		for anded := row & col; anded > 0; anded >>= 1 {
-			par ^= anded & 1
-		}
-		if par == 1 {
-			return n
-		}
-		return p
-	},
+	return NewFuncGateNoCheck(
+		// get(row, col)
+		func(row int, col int) complex128 {
+			// Calculate (-1)**<i,j> / sqrt(2**n)
+			par := 0
+			for anded := row & col; anded > 0; anded >>= 1 {
+				par ^= anded & 1
+			}
+			if par == 1 {
+				return n
+			}
+			return p
+		},
+		// bits()
 		bits)
 }
 
