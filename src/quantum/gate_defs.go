@@ -42,7 +42,6 @@ func NewHadamardGate(width int) *Gate {
 			}
 			return p
 		},
-		// width()
 		width)
 }
 

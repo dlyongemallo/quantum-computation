@@ -30,12 +30,19 @@ type Gate struct {
 	// The matrix elements of the gate.
 	get   func(row int, col int) complex128
 
-	// The dimension of the Hilbert space.
-	// This is equal to math.Pow(2, width).
-	dim func() int
-	
 	// The width of the gate (number of qubits).
-	width  func() int
+	width int
+}
+
+// Accessor for the width of a Gate.
+func (gate *Gate) Width() int {
+	return gate.width
+}
+
+// Accessor for the dimension of a Gate's Hilbert space.
+func (gate *Gate) dim() int {
+	// This is equal to math.Pow(2, width).
+	return 1<<uint(gate.width)
 }
 
 func (gate *Gate) computeSquareElement(row int, col int, c chan bool) {
@@ -72,17 +79,7 @@ func (gate *Gate) IsUnitary() bool {
 }
 
 func NewFuncGateNoCheck(f func(row int, col int) complex128, width int) *Gate {
-	return &Gate{
-		// get(row, col)
-		f,
-		// dim()
-		func() int {
-			return 1 << uint(width)
-		},
-		// width()
-		func() int {
-			return width
-		}}
+	return &Gate{f, width}
 }
 
 func NewFuncGate(f func(row int, col int) complex128, width int) *Gate {
@@ -100,7 +97,7 @@ func NewArrayGate(arr []complex128) *Gate {
 		func(row int, col int) complex128 {
 			return arr[row*dim+col]
 		},
-		// width()
+		// width
 		int(math.Log2(float64(dim))))
 }
 
@@ -189,8 +186,8 @@ func (gate *Gate) Apply(qreg *QReg, targets []int) {
 }
 
 func (gate *Gate) ApplyRange(qreg *QReg, targetRangeStart int) {
-	targets := make([]int, gate.width())
-	for i := 0; i < gate.width(); i++ {
+	targets := make([]int, gate.Width())
+	for i := 0; i < gate.Width(); i++ {
 		targets[i] = targetRangeStart + i
 	}
 	gate.Apply(qreg, targets)
