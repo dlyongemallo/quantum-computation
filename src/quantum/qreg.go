@@ -48,6 +48,56 @@ func NewQReg(width int, values ...int) *QReg {
 	return qreg
 }
 
+// Compose multiple quantum registers into a single register.
+func Compose(qregs ...*QReg) *QReg {
+	// There have to be at least two registers.
+	if len(qregs) < 2 {
+		panic("Compose called with fewer than two quantum registers.")
+	}
+
+	// Compute the width of the combined register.
+	newWidth := qregs[0].width
+	for regIndex := 1; regIndex < len(qregs); regIndex++ {
+		newWidth += qregs[regIndex].width
+	}
+	composedQReg := &QReg{newWidth, make([]complex128, 1<<uint(newWidth))}
+
+	// Compute the amplitudes in a way that reuses intermediate values.
+	computeTensorProductAmplitudes(newWidth, 1.0, composedQReg.amplitudes, qregs...)
+	return composedQReg
+}
+
+// A helper function to compute the amplitudes of the tensor product of multiple
+// quantum registers.
+func computeTensorProductAmplitudes(width int, product complex128, outputSlice []complex128,
+	qregs ...*QReg) {
+
+	// If we are at the last register, then just apply the product.
+	if len(qregs) == 1 {
+		for i := 0; i < len(qregs[0].amplitudes); i++ {
+			outputSlice[i] = product * qregs[0].amplitudes[i]
+		}
+		return
+	}
+
+	// Otherwise, recursively compute the running product from one more level
+	// of quantum register.
+	remainingWidth := width - qregs[0].width
+	sliceLen := 1 << uint(remainingWidth)
+	offset := 0
+	for ampIndex := 0; ampIndex < len(qregs[0].amplitudes); ampIndex++ {
+		amplitude := qregs[0].amplitudes[ampIndex]
+		if amplitude != 0 {
+			computeTensorProductAmplitudes(
+				remainingWidth,
+				product*amplitude,
+				outputSlice[offset:offset+sliceLen],
+				qregs[1:]...)
+		}
+		offset += sliceLen
+	}
+}
+
 // Set the QReg to a state in the standard basis. If no value is given, default
 // to the all zero state. If one value is given, interpret it as the integer
 // representation of a basis state. If a series of binary values are given,
@@ -285,9 +335,9 @@ func (qreg *QReg) Print() {
 }
 
 func (qreg *QReg) PrintNonZero() {
-	for i, amplitude := range qreg.amplitudes {
+	for label, amplitude := range qreg.amplitudes {
 		if amplitude != 0 {
-			qreg.PrintStateln(i)
+			qreg.PrintStateln(label)
 		}
 	}
 }

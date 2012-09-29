@@ -69,6 +69,25 @@ func TestNewQReg(t *testing.T) {
 	}
 }
 
+// Test the compose function.
+func TestCompose(t *testing.T) {
+	// |0> (x) |1> = |01>
+	qreg := Compose(KetZero(), KetOne())
+	if !isBasisState(qreg, 1) {
+		t.Error("Expected |01>.")
+	}
+	// |01> (x) |0> = |010>
+	qreg = Compose(qreg, KetZero())
+	if !isBasisState(qreg, 2) {
+		t.Error("Expected |010>.")
+	}
+	// |1> (x) |1> (x) |010> = |11010>
+	qreg = Compose(Compose(KetOne(), KetOne()), qreg)
+	if !isBasisState(qreg, 26) {
+		t.Error("Expected |11010>.")
+	}
+}
+
 // Test that the correct values are computed for the probability of observing
 // a basis state.
 func TestQRegStateProb(t *testing.T) {
