@@ -31,16 +31,16 @@ type Gate struct {
 	get   func(row int, col int) complex128
 
 	// The dimension of the Hilbert space.
-	// This is equal to math.Pow(2, "bits").
-	width func() int
+	// This is equal to math.Pow(2, width).
+	dim func() int
 	
 	// The width of the gate (number of qubits).
-	bits  func() int
+	width  func() int
 }
 
 func (gate *Gate) computeSquareElement(row int, col int, c chan bool) {
 	sum := complex(0, 0)
-	for i := 0; i < gate.width(); i++ {
+	for i := 0; i < gate.dim(); i++ {
 		sum += gate.get(row, i) * gate.get(i, col)
 	}
 	if row == col {
@@ -58,12 +58,12 @@ func (gate *Gate) computeSquareElement(row int, col int, c chan bool) {
 // This tells us whether or not a gate is unitary (it should always be)
 func (gate *Gate) IsUnitary() bool {
 	c := make(chan bool)
-	for row := 0; row < gate.width(); row++ {
-		for col := 0; col < gate.width(); col++ {
+	for row := 0; row < gate.dim(); row++ {
+		for col := 0; col < gate.dim(); col++ {
 			go gate.computeSquareElement(row, col, c)
 		}
 	}
-	for i := 0; i < gate.width()*gate.width(); i++ {
+	for i := 0; i < gate.dim()*gate.dim(); i++ {
 		if <-c {
 			return false
 		}
@@ -71,22 +71,22 @@ func (gate *Gate) IsUnitary() bool {
 	return true
 }
 
-func NewFuncGateNoCheck(f func(row int, col int) complex128, bits int) *Gate {
+func NewFuncGateNoCheck(f func(row int, col int) complex128, width int) *Gate {
 	return &Gate{
 		// get(row, col)
 		f,
+		// dim()
+		func() int {
+			return 1 << uint(width)
+		},
 		// width()
 		func() int {
-			return 1 << uint(bits)
-		},
-		// bits()
-		func() int {
-			return bits
+			return width
 		}}
 }
 
-func NewFuncGate(f func(row int, col int) complex128, bits int) *Gate {
-	gate := NewFuncGateNoCheck(f, bits)
+func NewFuncGate(f func(row int, col int) complex128, width int) *Gate {
+	gate := NewFuncGateNoCheck(f, width)
 	if !gate.IsUnitary() {
 		panic("Gate is not unitary")
 	}
@@ -94,14 +94,14 @@ func NewFuncGate(f func(row int, col int) complex128, bits int) *Gate {
 }
 
 func NewArrayGate(arr []complex128) *Gate {
-	width := int(math.Sqrt(float64(len(arr))))
+	dim := int(math.Sqrt(float64(len(arr))))
 	return NewFuncGate(
 		// get(row, col)
 		func(row int, col int) complex128 {
-			return arr[row*width+col]
+			return arr[row*dim+col]
 		},
-		// bits()
-		int(math.Log2(float64(width))))
+		// width()
+		int(math.Log2(float64(dim))))
 }
 
 func NewRealArrayGate(arr []float64) *Gate {
@@ -112,14 +112,14 @@ func NewRealArrayGate(arr []float64) *Gate {
 	return NewArrayGate(newArr)
 }
 
-func NewClassicalGate(f func(x int) int, bits int) *Gate {
+func NewClassicalGate(f func(x int) int, width int) *Gate {
 	return NewFuncGate(func(row int, col int) complex128 {
 		if f(col) == row {
 			return complex(1, 0)
 		}
 		return complex(0, 0)
 	},
-		bits)
+		width)
 }
 
 func stateIndexForTarget(application int, targetValue int, size int, targets []int) int {
@@ -152,7 +152,7 @@ type indexAmplitude struct {
 // Compute one row of matrix multiplication
 func (gate *Gate) computeRow(qreg *QReg, app int, row int, targets []int, c chan indexAmplitude) {
 	sum := complex128(complex(0, 0))
-	for col := 0; col < gate.width(); col++ {
+	for col := 0; col < gate.dim(); col++ {
 		index := stateIndexForTarget(app, col, qreg.width, targets)
 		sum += gate.get(row, col) * qreg.amplitudes[index]
 	}
@@ -177,10 +177,10 @@ func (gate *Gate) Apply(qreg *QReg, targets []int) {
 	for app := 0; app < numApps; app++ {
 		// Each row of the matrix
 		c := make(chan indexAmplitude)
-		for row := 0; row < gate.width(); row++ {
+		for row := 0; row < gate.dim(); row++ {
 			go gate.computeRow(qreg, app, row, targets, c)
 		}
-		for row := 0; row < gate.width(); row++ {
+		for row := 0; row < gate.dim(); row++ {
 			ia := <-c
 			newAmplitudes[ia.index] = ia.amplitude
 		}
@@ -189,8 +189,8 @@ func (gate *Gate) Apply(qreg *QReg, targets []int) {
 }
 
 func (gate *Gate) ApplyRange(qreg *QReg, targetRangeStart int) {
-	targets := make([]int, gate.bits())
-	for i := 0; i < gate.bits(); i++ {
+	targets := make([]int, gate.width())
+	for i := 0; i < gate.width(); i++ {
 		targets[i] = targetRangeStart + i
 	}
 	gate.Apply(qreg, targets)
@@ -202,10 +202,10 @@ func (gate *Gate) ApplyReg(qreg *QReg) {
 
 func (gate *Gate) Print() {
 	// Get column sizes
-	sizes := make([]int, gate.width())
-	for col := 0; col < gate.width(); col++ {
+	sizes := make([]int, gate.dim())
+	for col := 0; col < gate.dim(); col++ {
 		max := 0
-		for row := 0; row < gate.width(); row++ {
+		for row := 0; row < gate.dim(); row++ {
 			l := len(fmt.Sprintf("%+f", gate.get(row, col)))
 			if l > max {
 				max = l
@@ -217,8 +217,8 @@ func (gate *Gate) Print() {
 		sizes[col] = max
 	}
 	// Print each row
-	for row := 0; row < gate.width(); row++ {
-		for col := 0; col < gate.width(); col++ {
+	for row := 0; row < gate.dim(); row++ {
+		for col := 0; col < gate.dim(); col++ {
 			str := fmt.Sprintf("%+f", gate.get(row, col))
 			for i := len(str); i < sizes[col]; i++ {
 				fmt.Print(" ")

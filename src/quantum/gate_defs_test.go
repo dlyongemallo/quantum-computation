@@ -23,8 +23,8 @@ import (
 
 func TestHadamardGate_2x2(t *testing.T) {
 	matrix := NewHadamardGate(1)
-	if matrix.width() != 2 {
-		t.Errorf("Bad width in 2x2 Hadamard")
+	if matrix.dim() != 2 {
+		t.Errorf("Bad dim in 2x2 Hadamard")
 	}
 	p := complex(1.0/math.Sqrt(2), 0)
 	n := -p
@@ -46,8 +46,8 @@ func TestHadamardGate_2x2(t *testing.T) {
 
 func TestHadamardGate_4x4(t *testing.T) {
 	matrix := NewHadamardGate(2)
-	if matrix.width() != 4 {
-		t.Errorf("Bad width in 4x4 Hadamard")
+	if matrix.dim() != 4 {
+		t.Errorf("Bad dim in 4x4 Hadamard")
 	}
 	p := complex(.5, 0)
 	n := -p
@@ -71,8 +71,8 @@ func TestHadamardGate_4x4(t *testing.T) {
 
 func TestDiffusionGate_2x2(t *testing.T) {
 	matrix := NewDiffusionGate(1)
-	if matrix.width() != 2 {
-		t.Errorf("Bad width in 2x2 Diffusion")
+	if matrix.dim() != 2 {
+		t.Errorf("Bad dim in 2x2 Diffusion")
 	}
 	p := complex(1.0, 0)
 	n := complex(0.0, 0)
@@ -94,8 +94,8 @@ func TestDiffusionGate_2x2(t *testing.T) {
 
 func TestDiffusionGate_4x4(t *testing.T) {
 	matrix := NewDiffusionGate(2)
-	if matrix.width() != 4 {
-		t.Errorf("Bad width in 4x4 Diffusion")
+	if matrix.dim() != 4 {
+		t.Errorf("Bad dim in 4x4 Diffusion")
 	}
 	p := complex(0.5, 0)
 	n := complex(-0.5, 0)

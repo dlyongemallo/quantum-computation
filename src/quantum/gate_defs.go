@@ -22,9 +22,9 @@ import (
 
 // Hadamard Gate
 
-func NewHadamardGate(bits int) *Gate {
-	d := float64(int(1 << uint(bits>>1)))
-	if bits&1 == 1 {
+func NewHadamardGate(width int) *Gate {
+	d := float64(int(1 << uint(width>>1)))
+	if width&1 == 1 {
 		d *= math.Sqrt2
 	}
 	p := complex(1.0/d, 0)
@@ -42,8 +42,8 @@ func NewHadamardGate(bits int) *Gate {
 			}
 			return p
 		},
-		// bits()
-		bits)
+		// width()
+		width)
 }
 
 func Hadamard(qreg *QReg, target int) {
@@ -62,8 +62,8 @@ func HadamardReg(qreg *QReg) {
 
 // Diffusion Gate
 
-func NewDiffusionGate(bits int) *Gate {
-	a2 := complex(2.0/float64(int(1<<uint(bits))), 0)
+func NewDiffusionGate(width int) *Gate {
+	a2 := complex(2.0/float64(int(1<<uint(width))), 0)
 	a2m1 := a2 - complex(1.0, 0)
 	return NewFuncGate(func(row int, col int) complex128 {
 		if row == col {
@@ -71,7 +71,7 @@ func NewDiffusionGate(bits int) *Gate {
 		}
 		return a2
 	},
-		bits)
+		width)
 }
 
 func Diffusion(qreg *QReg, target int) {
