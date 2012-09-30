@@ -12,7 +12,8 @@
 //      See the License for the specific language governing permissions and
 //      limitations under the License.
 //
-// Author: conleyo@google.com (Conley Owens)
+// Authors: conleyo@google.com (Conley Owens),
+//          davinci@google.com (David Yonge-Mallo)
 
 package quantum
 

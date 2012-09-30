@@ -12,13 +12,31 @@
 //      See the License for the specific language governing permissions and
 //      limitations under the License.
 //
-// Author: conleyo@google.com (Conley Owens)
+// Authors: conleyo@google.com (Conley Owens),
+//          davinci@google.com (David Yonge-Mallo)
 
 package quantum
 
 import (
 	"math"
 )
+
+// Define gates for single-qubit operations.
+
+// The Pauli X gate or NOT gate.
+func NewXGate() *GenericGate {
+        applyX := func(qreg *QReg, targets ...int) {
+                if len(targets) != 1 {
+                        panic("Pauli X gate must have one target qubit.")
+                }
+                target := targets[0]
+                if target < 0 || target >= qreg.width {
+                        panic("Pauli X gate target out of range.")
+                }
+        }
+        // Do something here.
+        return &GenericGate{1, applyX, applyX}
+}
 
 // Hadamard Gate
 

@@ -12,7 +12,8 @@
 //      See the License for the specific language governing permissions and
 //      limitations under the License.
 //
-// Author: conleyo@google.com (Conley Owens)
+// Authors: conleyo@google.com (Conley Owens),
+//          davinci@google.com (David Yonge-Mallo)
 
 package quantum
 
@@ -21,6 +22,19 @@ import (
 	"math"
 	"math/cmplx"
 )
+
+// A quantum gate has a width, and funtions to apply itself and its Hermitian
+// conjugate (dagger) to a quantum register.
+type GenericGate struct {
+        // The width of this gate (how many qubits it acts upon).
+        width int
+
+        // Application of this gate to a quantum register.
+        Apply func(qreg *QReg, targets ...int)
+
+        // Application of the Hermitian conjugate of this gate to a quantum register.
+        ApplyDagger func(qreg *QReg, target ...int)
+}
 
 func closeEnough(a complex128, b complex128) bool {
 	return math.Abs(cmplx.Abs(a)-cmplx.Abs(b)) < .0000000001
@@ -45,24 +59,31 @@ func (gate *Gate) dim() int {
 	return 1<<uint(gate.width)
 }
 
+// 
 func (gate *Gate) computeSquareElement(row int, col int, c chan bool) {
 	sum := complex(0, 0)
 	for i := 0; i < gate.dim(); i++ {
+                // This computation is wrong if the matrix is complex-valued,
+                // since we want to check if U^{dag} U = I, and so one of
+                // these should be the complex conjugate.
+                // TODO(davinci): Fix this.
 		sum += gate.get(row, i) * gate.get(i, col)
 	}
 	if row == col {
+                // Check that the diagonal elements sum to 1.
 		if closeEnough(sum, complex(1, 0)) {
 			c <- false
 			return
 		}
 	} else if closeEnough(sum, complex(0, 0)) {
+                // Check that the off-diagonal elements sum to 0.
 		c <- false
 		return
 	}
 	c <- true
 }
 
-// This tells us whether or not a gate is unitary (it should always be)
+// This tells us whether or not a gate is unitary (it should always be).
 func (gate *Gate) IsUnitary() bool {
 	c := make(chan bool)
 	for row := 0; row < gate.dim(); row++ {
@@ -157,10 +178,10 @@ func (gate *Gate) computeRow(qreg *QReg, app int, row int, targets []int, c chan
 	c <- indexAmplitude{index, sum}
 }
 
-// Apply an arbitrary matrix to a quantum register
+// Apply an arbitrary matrix to a quantum register.
 // len(matrix) == 4 ** len(targets)
 func (gate *Gate) Apply(qreg *QReg, targets []int) {
-	// Verify that all the targets are valid
+	// Verify that all the targets are valid.
 	for _, target := range targets {
 		if target >= qreg.width {
 			panic(fmt.Sprintf("%d is not a valid target", target))
