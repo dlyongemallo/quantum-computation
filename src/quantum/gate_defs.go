@@ -24,7 +24,7 @@ import (
 // Define gates for single-qubit operations.
 
 // The Pauli X gate or NOT gate.
-func NewXGate() *GenericGate {
+func NewXGate() *QuantumGate {
         applyX := func(qreg *QReg, targets ...int) {
                 if len(targets) != 1 {
                         panic("Pauli X gate must have one target qubit.")
@@ -35,7 +35,7 @@ func NewXGate() *GenericGate {
                 }
         }
         // Do something here.
-        return &GenericGate{1, applyX, applyX}
+        return &QuantumGate{1, applyX, applyX}
 }
 
 // Hadamard Gate

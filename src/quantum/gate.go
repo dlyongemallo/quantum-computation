@@ -25,7 +25,7 @@ import (
 
 // A quantum gate has a width, and funtions to apply itself and its Hermitian
 // conjugate (dagger) to a quantum register.
-type GenericGate struct {
+type QuantumGate struct {
         // The width of this gate (how many qubits it acts upon).
         width int
 
@@ -59,14 +59,14 @@ func (gate *Gate) dim() int {
 	return 1<<uint(gate.width)
 }
 
-// 
+// Compute the value of one element of U^{dag} U.
 func (gate *Gate) computeSquareElement(row int, col int, c chan bool) {
 	sum := complex(0, 0)
 	for i := 0; i < gate.dim(); i++ {
                 // This computation is wrong if the matrix is complex-valued,
                 // since we want to check if U^{dag} U = I, and so one of
                 // these should be the complex conjugate.
-                // TODO(davinci): Fix this.
+                // TODO(davinci): Verify whether this is broken, and if so fix.
 		sum += gate.get(row, i) * gate.get(i, col)
 	}
 	if row == col {
@@ -140,23 +140,32 @@ func NewClassicalGate(f func(x int) int, width int) *Gate {
 		width)
 }
 
-func stateIndexForTarget(application int, targetValue int, size int, targets []int) int {
-	stateVector := make([]int, size)
-	for i := 0; i < size; i++ {
+func stateIndexForTarget(application int, targetValue int, width int, targets []int) int {
+	// It seems terribly inefficient to have to compute this for every
+	// value of targetValue.
+	// TODO(davinci): Fix this.
+
+	// Create a vector with width elements and initialise to an invalid value.
+	stateVector := make([]int, width)
+	for i := 0; i < width; i++ {
 		stateVector[i] = 2
 	}
+	// For each target qubit, compute its contribution to the bit
+	// vector of the final index.
 	for i := 0; i < len(targets); i++ {
 		stateVector[targets[i]] = (targetValue >> uint(i)) & 1
 	}
+	// Ditto for each non-target qubit.
 	appPos := 0
-	for i := 0; i < size; i++ {
+	for i := 0; i < width; i++ {
 		if stateVector[i] == 2 {
 			stateVector[i] = (application >> uint(appPos)) & 1
 			appPos++
 		}
 	}
+	// Sum them to form the final index.
 	index := 0
-	for i := 0; i < size; i++ {
+	for i := 0; i < width; i++ {
 		index += stateVector[i] << uint(i)
 	}
 	return index
