@@ -23,29 +23,23 @@ import (
 	"math/cmplx"
 )
 
-// A quantum gate has a width, and funtions to apply itself and its Hermitian
-// conjugate (dagger) to a quantum register.
-type QuantumGate struct {
-        // The width of this gate (how many qubits it acts upon).
-        width int
-
-        // Application of this gate to a quantum register.
-        Apply func(qreg *QReg, targets ...int)
-
-        // Application of the Hermitian conjugate of this gate to a quantum register.
-        ApplyDagger func(qreg *QReg, target ...int)
-}
-
 func closeEnough(a complex128, b complex128) bool {
-	return math.Abs(cmplx.Abs(a)-cmplx.Abs(b)) < .0000000001
+	return math.Abs(cmplx.Abs(a)-cmplx.Abs(b)) < threshold
 }
 
+// A quantum gate.
 type Gate struct {
-	// The matrix elements of the gate.
-	get   func(row int, col int) complex128
-
-	// The width of the gate (number of qubits).
+	// The width of this gate (how many qubits it acts upon).
 	width int
+
+	// The elements of the matrix representation of the gate in the standard
+        // basis.
+	get   func(row, col int) complex128
+}
+
+// Get an element of the Hermitian conjugate (dagger) of the gate's matrix.
+func (gate *Gate) getDagger(row, col int) complex128 {
+	return cmplx.Conj(gate.get(col, row))
 }
 
 // Accessor for the width of a Gate.
@@ -53,21 +47,19 @@ func (gate *Gate) Width() int {
 	return gate.width
 }
 
-// Accessor for the dimension of a Gate's Hilbert space.
+// The dimension of the Hilbert space over which this gate acts.
 func (gate *Gate) dim() int {
 	// This is equal to math.Pow(2, width).
 	return 1<<uint(gate.width)
 }
 
-// Compute the value of one element of U^{dag} U.
-func (gate *Gate) computeSquareElement(row int, col int, c chan bool) {
+// Compute the value of one element of U^{dag} U, and return true if differs
+// from the corresponding element in the identity matrix.
+// TODO(davinci): Move this to the test file.
+func (gate *Gate) computeSquareElement(row, col int, c chan bool) {
 	sum := complex(0, 0)
 	for i := 0; i < gate.dim(); i++ {
-                // This computation is wrong if the matrix is complex-valued,
-                // since we want to check if U^{dag} U = I, and so one of
-                // these should be the complex conjugate.
-                // TODO(davinci): Verify whether this is broken, and if so fix.
-		sum += gate.get(row, i) * gate.get(i, col)
+		sum += gate.getDagger(row, i) * gate.get(i, col)
 	}
 	if row == col {
                 // Check that the diagonal elements sum to 1.
@@ -84,6 +76,7 @@ func (gate *Gate) computeSquareElement(row int, col int, c chan bool) {
 }
 
 // This tells us whether or not a gate is unitary (it should always be).
+// TODO(davinci): Move this to the test file.
 func (gate *Gate) IsUnitary() bool {
 	c := make(chan bool)
 	for row := 0; row < gate.dim(); row++ {
@@ -93,14 +86,19 @@ func (gate *Gate) IsUnitary() bool {
 	}
 	for i := 0; i < gate.dim()*gate.dim(); i++ {
 		if <-c {
+			// U^{dag} U is not the identity matrix, so U is not
+			// unitary.
 			return false
 		}
 	}
+	// U passes the test, so it is unitary.
 	return true
 }
 
+
+
 func NewFuncGateNoCheck(f func(row int, col int) complex128, width int) *Gate {
-	return &Gate{f, width}
+	return &Gate{width, f}
 }
 
 func NewFuncGate(f func(row int, col int) complex128, width int) *Gate {

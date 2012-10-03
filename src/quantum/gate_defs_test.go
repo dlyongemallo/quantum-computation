@@ -18,9 +18,53 @@
 package quantum
 
 import (
+	"fmt"
 	"math"
 	"testing"
 )
+
+// For debugging.
+var _ = fmt.Println
+
+// Check each element of the gate against the expected value.
+func verifyGate(expected, actual *Gate) bool {
+	if actual.Width() != expected.Width() {
+		return false
+	}
+	for row := 0; row < actual.dim(); row++ {
+		for col := 0; col < actual.dim(); col++ {
+			if !closeEnough(expected.get(row, col), actual.get(row, col)) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func TestPauliGates(t *testing.T) {
+	// TODO(davinci): Test each of the Pauli gates with their eigenvectors.
+}
+
+func TestOneQubitRotationGates(t *testing.T) {
+	x := PauliX()
+	y := PauliY()
+	z := PauliZ()
+	rx := RotationX(math.Pi)
+	ry := RotationY(math.Pi)
+	rz := RotationZ(math.Pi)
+
+	if !verifyGate(x, rx) {
+		t.Error("Expected Pauli X.")
+	}
+	if !verifyGate(y, ry) {
+		t.Error("Expected Pauli Y.")
+	}
+	if !verifyGate(z, rz) {
+		t.Error("Expected Pauli Z.")
+	}
+
+	// TODO(davinci): Add more tests.
+}
 
 func TestHadamardGate_2x2(t *testing.T) {
 	matrix := NewHadamardGate(1)
