@@ -1,4 +1,4 @@
-n = 6;
+n = 4;
 N = 2**n;
 
 % Hamming weights.
@@ -16,4 +16,6 @@ mvec = cvec .* pvec / (total / 2);
 
 % Cumulative sum of probabilities.
 svec = cumsum(mvec);
-plot(svec);
+
+% Comparison to classical case.
+plot(kvec, svec, kvec, cumsum(cvec)/sum(cvec));
