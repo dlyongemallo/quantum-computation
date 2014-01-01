@@ -108,29 +108,31 @@ for i = 0:(2**(N-1))-1
     v = v/N;
 
     % Print the output.
-    disp(sprintf('%s: %s', formatted,
-        strrep(['(' sprintf(' % 2.3f,', v) ')'], ',)', ' )')))
+    % disp(sprintf('%s: %s', formatted,
+    %     strrep(['(' sprintf(' % 2.3f,', v) ')'], ',)', ' )')))
 
     % Tally the probability of measuring |0...0>.
     denom = denom + abs(v').**2;
 
     % Find sets of orthogonal vectors.
-    % vs(i+1,:) = v;
-    % for j = 1:i
-    %     if (dot(vs(j,:),v) == 0)
-    %         % disp(sprintf('%s : %s', dec2bin(j-1,N), dec2bin(i,N)));
-    %         orthoSetSize(j)++;
-    %         break;
-    %     end
-    % end
+    vs(i+1,:) = v;
+    for j = 1:i
+        if (dot(vs(j,:),v) == 0)
+            % disp(sprintf('%s : %s', dec2bin(j-1,N), dec2bin(i,N)));
+            orthoSetSize(j)++;
+
+            orthoSetSize(i+1)++;
+            % break;
+        end
+    end
 end
 
 % Output the sizes of the orthogonal sets.
-% for i = 0:(2**(N-1))-1
-%     if (orthoSetSize(i+1) != 0)
-%         disp(sprintf('%s : %d', dec2bin(i,N), orthoSetSize(i+1)));
-%     end
-% end
+for i = 0:(2**(N-1))-1
+    if (orthoSetSize(i+1) != 0)
+        disp(sprintf('%s : %d', dec2bin(i,N), orthoSetSize(i+1)));
+    end
+end
 
 % Output the probability denominator.
 % disp(sprintf('Denominator in p(|0...0>): %d', denom));
