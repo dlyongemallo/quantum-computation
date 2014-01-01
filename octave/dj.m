@@ -85,9 +85,9 @@ for i = 0:(2**(N-1))-1
     % Get the promise function as a {0,1}-vector.
     [p, type, formatted] = nicebits(i,N);
 
-    % Early exit if neither constant nor balanced.
+    % Count whether morse or balanced.
     if (isempty(type))
-        continue
+        % continue
     elseif (type == 'bm')
         nMorse = nMorse + 1;
         nBalanced = nBalanced +1;
@@ -110,6 +110,15 @@ for i = 0:(2**(N-1))-1
 
     % Tally the probability of measuring |0...0>.
     denom = denom + abs(v').**2;
+
+    % Find sets of orthogonal vectors.
+    % vs(i+1,:) = v;
+    % for j = 1:i
+    %     if (dot(vs(j,:),v) == 0)
+    %         disp(sprintf('%s : %s', dec2bin(j-1,N), dec2bin(i,N)));
+    %         break;
+    %     end
+    % end
 end
 
 % Output the probability denominator.
