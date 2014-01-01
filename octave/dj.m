@@ -76,6 +76,9 @@ denom = zeros(1,N);
 nBalanced = 0;
 nMorse = 0;
 
+% Keep track of sizes of orthogonal sets.
+orthoSetSize = zeros(1,2**(N-1));
+
 % Cycle through all possible promise functions which begin with '0'.
 % (The binary complements result in the same output but with -1 global phase.)
 for i = 0:(2**(N-1))-1
@@ -115,11 +118,19 @@ for i = 0:(2**(N-1))-1
     % vs(i+1,:) = v;
     % for j = 1:i
     %     if (dot(vs(j,:),v) == 0)
-    %         disp(sprintf('%s : %s', dec2bin(j-1,N), dec2bin(i,N)));
+    %         % disp(sprintf('%s : %s', dec2bin(j-1,N), dec2bin(i,N)));
+    %         orthoSetSize(j)++;
     %         break;
     %     end
     % end
 end
+
+% Output the sizes of the orthogonal sets.
+% for i = 0:(2**(N-1))-1
+%     if (orthoSetSize(i+1) != 0)
+%         disp(sprintf('%s : %d', dec2bin(i,N), orthoSetSize(i+1)));
+%     end
+% end
 
 % Output the probability denominator.
 % disp(sprintf('Denominator in p(|0...0>): %d', denom));
