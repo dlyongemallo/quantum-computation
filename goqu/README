@@ -1,3 +1,6 @@
+
+Fork of https://github.com/cco3/goqu/ for experimental purposes.
+
 == INSTALLATION ==
 
 make && make install
