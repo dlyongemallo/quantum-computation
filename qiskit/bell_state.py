@@ -29,6 +29,7 @@ circuit = QuantumCircuit(q, c)
 circuit.h(q[0])
 circuit.cx(q[0], q[1])
 circuit.measure(q, c)
+print(circuit.draw())
 
 # Execute the circuit on the device.
 job = execute(circuit, device, shots=1000)
