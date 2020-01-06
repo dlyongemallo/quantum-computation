@@ -23,8 +23,9 @@ use_device = False
 simulator = Aer.get_backend('statevector_simulator')
 if use_device:
     device = least_busy(provider.backends(
-        filters=lambda x: x.configuration().n_qubits <= 5 and
+        filters=lambda x: x.configuration().n_qubits >= 3 and
         not x.configuration().simulator and x.status().operational==True))
+    print("Using backend: ", device)
 else:
     device = Aer.get_backend('qasm_simulator')
 

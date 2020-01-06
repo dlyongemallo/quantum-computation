@@ -8,6 +8,7 @@ from qiskit import(
     QuantumRegister,
     ClassicalRegister,
     execute, IBMQ, Aer)
+from qiskit.providers.ibmq import least_busy
 
 # Register with the API.
 IBMQ.load_account()
@@ -16,7 +17,10 @@ provider = IBMQ.get_provider(hub='ibm-q')
 # Set to true to use an actual device.
 use_device = False
 if use_device:
-    device = provider.get_backend('ibmq_vigo')
+    device = least_busy(provider.backends(
+        filters=lambda x: x.configuration().n_qubits >= 2 and
+        not x.configuration().simulator and x.status().operational==True))
+    print("Using backend: ", device)
 else:
     device = Aer.get_backend('qasm_simulator')
 

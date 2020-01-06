@@ -11,8 +11,7 @@ IBMQ.load_account()
 provider = IBMQ.get_provider(hub='ibm-q')
 
 # Get the least busy backend satisfying requirements.
-# provider.backends()
 backend = least_busy(provider.backends(
-    filters=lambda x: x.configuration().n_qubits <= 5 and
+    filters=lambda x: x.configuration().n_qubits >= 5 and
     not x.configuration().simulator and x.status().operational==True))
 print("least busy backend: ", backend)
