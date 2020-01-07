@@ -21,7 +21,7 @@ def main():
 
     # Simulate the circuit.
     device = cirq.Simulator()
-    result = device.run(circuit, repetitions=1000)
+    result = device.run(circuit, repetitions=1024)
     print(result.histogram(key='result'))
 
 if __name__ == '__main__':
