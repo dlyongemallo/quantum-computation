@@ -36,7 +36,7 @@ circuit.measure(q, c)
 print(circuit.draw())
 
 # Execute the circuit on the device.
-job = execute(circuit, device, shots=1000)
+job = execute(circuit, device, shots=1024)
 
 # Get the result counts.
 result = job.result()

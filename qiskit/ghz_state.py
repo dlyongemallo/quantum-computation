@@ -28,7 +28,7 @@ q = QuantumRegister(3)
 c = ClassicalRegister(3)
 circuit = QuantumCircuit(q, c)
 
-# Create a Bell state (psi+).
+# Create a GHZ state.
 circuit.h(q[0])
 circuit.cx(q[0], q[1])
 circuit.cx(q[0], q[2])
@@ -36,7 +36,7 @@ circuit.measure(q, c)
 print(circuit.draw())
 
 # Execute the circuit on the device.
-job = execute(circuit, device, shots=1000)
+job = execute(circuit, device, shots=1024)
 
 # Get the result counts.
 result = job.result()
