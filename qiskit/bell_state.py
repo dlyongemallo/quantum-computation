@@ -41,4 +41,4 @@ job = execute(circuit, device, shots=1024)
 # Get the result counts.
 result = job.result()
 counts = result.get_counts(circuit)
-print("\nTotal counts are:", counts)
+print("\nTotal counts are:", dict(sorted(counts.items())))

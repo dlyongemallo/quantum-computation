@@ -63,8 +63,8 @@ print("\nState vector (RASB) is:\n", np.vstack(labeled_statevector))
 qc.cx(r, alice)
 qc.h(r)
 qc.cx(r, ursula)
-qc.h(r)
-qc.cx(r, alice)
+# qc.h(r)
+# qc.cx(r, alice)
 qc.barrier()
 
 # Wigner measures Bob's lab (S + B) in the basis
@@ -73,8 +73,8 @@ qc.barrier()
 qc.cx(s, bob)
 qc.h(s)
 qc.cx(s, wigner)
-qc.h(s)
-qc.cx(s, bob)
+# qc.h(s)
+# qc.cx(s, bob)
 qc.barrier()
 
 # Measure Ursula and Wigner's qubits.
@@ -84,12 +84,12 @@ qc.measure(wigner, c[1])
 print(qc)
 
 # Simulate the state vector.
-statevector = execute(qc, simulator).result().get_statevector(qc, decimals=3)
-labeled_statevector = list(zip([format(i, '06b')[::-1] for i in range(64)], statevector))
-print("\nState vector (RASBUW) is:\n", np.vstack(labeled_statevector))
+# statevector = execute(qc, simulator).result().get_statevector(qc, decimals=3)
+# labeled_statevector = list(zip([format(i, '06b')[::-1] for i in range(64)], statevector))
+# print("\nState vector (RASBUW) is:\n", np.vstack(labeled_statevector))
 
 # Execute the circuit on the device.
 job = execute(qc, device, shots=1024)
 result = job.result()
 counts = result.get_counts(qc)
-print("\nTotal counts are:", counts)
+print("\nTotal counts are:", dict(sorted(counts.items())))

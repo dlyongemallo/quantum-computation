@@ -97,7 +97,7 @@ job = execute(circuit, device, shots=1024)
 try:
     result = job.result()
     counts = result.get_counts(circuit)
-    print("\nTotal counts are:", counts)
+    print("\nTotal counts are:", dict(sorted(counts.items())))
     # plot_histogram(counts)
 except IBMQJobFailureError:
     print(job.error_message())
