@@ -24,7 +24,7 @@ sub_q = QuantumRegister(2)
 sub = QuantumCircuit(sub_q, name='ctrl-Y^{A/2}')
 sub.cry(math.pi/2, sub_q[0], sub_q[1])
 sub.rz(math.pi/4, sub_q[0])
-c_sqrt_y = sub.to_instruction()
+c_sqrt_y_half = sub.to_instruction()
 
 # Init 2 qubits.
 q = QuantumRegister(2)
@@ -32,8 +32,8 @@ qc = QuantumCircuit(q)
 
 # Construct circuit.
 qc.y(q[0])
-qc.append(c_sqrt_y, [q[0], q[1]])
-qc.append(c_sqrt_y, [q[1], q[0]])
+qc.append(c_sqrt_y_half, [q[0], q[1]])
+qc.append(c_sqrt_y_half, [q[1], q[0]])
 print(qc)
 
 job = execute(qc, device)
