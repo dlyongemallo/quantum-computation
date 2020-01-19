@@ -9,7 +9,6 @@ from qiskit import(
     QuantumRegister,
     ClassicalRegister,
     execute, IBMQ, Aer)
-from qiskit.extensions import CyGate
 import math
 import numpy as np
 
