@@ -13,14 +13,12 @@ from qiskit.providers.ibmq.job.exceptions import IBMQJobFailureError
 import math
 import numpy as np
 
-# Register with the API.
-IBMQ.load_account()
-provider = IBMQ.get_provider(hub='ibm-q')
-
 # Set to true to use an actual device.
 use_device = False
 simulator = Aer.get_backend('statevector_simulator')
 if use_device:
+    IBMQ.load_account()
+    provider = IBMQ.get_provider(hub='ibm-q')
     device = least_busy(provider.backends(
         filters=lambda x: x.configuration().n_qubits >= 6 and
         not x.configuration().simulator and x.status().operational==True))

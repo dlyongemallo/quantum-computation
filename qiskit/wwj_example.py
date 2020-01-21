@@ -12,10 +12,6 @@ from qiskit import(
 import math
 import numpy as np
 
-# Register with the API.
-IBMQ.load_account()
-provider = IBMQ.get_provider(hub='ibm-q')
-
 device = Aer.get_backend('unitary_simulator')
 
 # Create subcircuit.

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Create a noise model for
+"""Create a noise model for a device.
 """
 
 from qiskit import(

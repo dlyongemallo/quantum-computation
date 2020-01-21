@@ -9,13 +9,11 @@ from qiskit import(
     ClassicalRegister,
     execute, IBMQ, Aer)
 
-# Register with the API.
-IBMQ.load_account()
-provider = IBMQ.get_provider(hub='ibm-q')
-
 # Set to true to use an actual device.
 use_device = False
 if use_device:
+    IBMQ.load_account()
+    provider = IBMQ.get_provider(hub='ibm-q')
     device = least_busy(provider.backends(
         filters=lambda x: x.configuration().n_qubits >= 3 and
         not x.configuration().simulator and x.status().operational==True))
