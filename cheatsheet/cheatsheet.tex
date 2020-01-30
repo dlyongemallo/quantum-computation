@@ -1,12 +1,40 @@
 \documentclass[a4paper,landscape,columns=3]{CheatSheet}
+\usepackage{bbm}
 
 \title{Quantum Quick Reference}
 \author{D. L. Yonge-Mallo}
 \date{\today}
 \begin{document}
+
+% Abbreviations.
+\newcommand{\pithalf}{\ensuremath{\frac{\pi t}{2}}}
+\newcommand{\ipithalf}{\ensuremath{\frac{i\pi t}{2}}}
+\newcommand{\one}{\ensuremath{\mathbbm{1}}}
+
 \maketitle
-\section{Section One}
-Some information.
+
+\section{Rotations}
+
+\begin{align*}
+X^{t} &= \exp\left(ipithalf\right)
+\begin{bmatrix}
+\cos\left(\pithalf\right) & -i\sin\left(\pithalf\right) \\
+-i\sin\left(\pithalf\right) & \cos\left(\pithalf\right) \\
+\end{bmatrix}\\
+Y^{t} &= \exp\left(\ipithalf\right)
+\begin{bmatrix}
+\cos\left(\pithalf\right) & -\sin\left(\pithalf\right) \\
+\sin\left(\pithalf\right) & \cos\left(\pithalf\right) \\
+\end{bmatrix}\\
+Z^{t} &= \exp\left(\ipithalf\right)
+\begin{bmatrix}
+\exp\left(-\ipithalf\right) & 0 \\
+0 & \exp\left(\ipithalf\right) \\
+\end{bmatrix}\\
+\end{align*}
+
+Recall that \(\exp(iAx) = \cos(x)\one + i\sin(A)X\).
+
 \section{Section Two}
 Some more information.
 \end{document}
