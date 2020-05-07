@@ -1,5 +1,8 @@
 \documentclass[a4paper,landscape,columns=3]{CheatSheet}
 \usepackage{bbm}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{quantikz}
 
 \title{Quantum Quick Reference}
 \author{D. L. Yonge-Mallo}
@@ -35,6 +38,76 @@ Z^{t} &= \exp\left(\ipithalf\right)
 
 Recall that \(\exp(iAx) = \cos(x)\one + i\sin(A)X\).
 
-\section{Section Two}
-Some more information.
+% \section{Academic Research}
+
+% \subsection{Game trees}
+
+\section{Useful Circuit Identities}
+
+\begin{tikzpicture}
+    \node[scale=1.0] {
+        \begin{quantikz}
+            & \ctrl{1} & \qw              & \ctrl{1} & \qw             & \qw \\
+            & \targ{}  & \gate{-\alpha/2} & \targ{}  & \gate{\alpha/2} & \qw
+        \end{quantikz}
+        =
+        \begin{quantikz}
+            & \ctrl{1}      & \qw \\
+            & \gate{\alpha} & \qw
+        \end{quantikz}
+    };
+\end{tikzpicture}
+
+\begin{tikzpicture}
+    \node[scale=0.9] {
+        \begin{quantikz}
+            & \ctrl{1} & \qw                   & \ctrl{1} & \qw                  & \qw \\
+            & \ctrl{1} & \gate[2]{CR(-\alpha)} & \ctrl{1} & \gate[2]{CR(\alpha)} & \qw \\
+            & \targ{}  & \qw                   & \targ{}  & \qw                  & \qw
+        \end{quantikz}
+        =
+        \begin{quantikz}
+            & \ctrl{1}      & \qw \\
+            & \ctrl{1}      & \qw \\
+            & \gate{\alpha} & \qw
+        \end{quantikz}
+    };
+\end{tikzpicture}
+
+
+\section{Variational Quantum Eigensolver (VQE)}
+
+% see 15275
+
+
+
+
+\section{QAOA}
+
+\section{Grover's search algorithm}
+% see 15280
+
+The Quantum Approximation Optimization Algorithm is...
+
+% \section{Virtual Environments}
+%
+% For Cirq:
+% \begin{lstlisting}
+% mkvirtualenv cirq-py3 --python=/usr/bin/python3
+% workon cirq-py3
+% \end{lstlisting}
+%
+% For Qiskit:
+% \begin{lstlisting}
+% python3 -m venv QiskitDevenv
+% source QiskitDevenv/bin/activate
+% \end{lstlisting}
+
+% \section{Installing packages from CTAN on macOS}
+% 
+% \begin{lstlisting}
+% tlmgr install quantikz
+% \end{lstlisting}
+
+
 \end{document}
