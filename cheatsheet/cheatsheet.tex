@@ -16,6 +16,13 @@
 
 \maketitle
 
+
+\section{Basic definitions}
+
+unitary
+Hermitian
+
+
 \section{Rotations}
 
 \begin{align*}
@@ -78,6 +85,18 @@ Recall that \(\exp(iAx) = \cos(x)\one + i\sin(A)X\).
 \section{Variational Quantum Eigensolver (VQE)}
 
 % see 15275
+
+VQE: seek low-energy states of a quantum many-body system with a local Hamiltonian.
+
+find eigenvalues of large matrix that represents Hamiltonian of a system
+usually looking for ground state energy, but can also use to find additional eigenvalues for excited state energies
+
+hybrid classical/quantum approach
+
+can use to find min of any objective fn which can be expressed as quantum circuit
+
+in variational methods, start with "best guess" or ansatz for ground state
+
 
 
 
