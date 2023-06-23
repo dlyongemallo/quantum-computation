@@ -3,6 +3,7 @@
 \usepackage{listings}
 \usepackage{tikz}
 \usetikzlibrary{quantikz}
+\usetikzlibrary{zx-calculus}
 
 % This uses the class: https://ctan.org/pkg/cheatsheet
 % Download and run "latex cheatsheet.ins".
@@ -19,6 +20,21 @@
 
 \maketitle
 
+\section{ZX Calculus}
+
+\begin{ZX}
+  \zxZ{\alpha} \arrow[r] & \zxFracX-{\pi}{4}
+\end{ZX}
+
+\section{Teleportation}
+
+% TODO: set wire type to classical, annotate measurement outcomes.
+
+\begin{quantikz}
+    \lstick{\ket{\psi}}          & \targ{}   & \qw      & \meter{} & \qw      & \ctrl{2} & \\
+    \lstick[2]{\ket{\beta_{00}}} & \ctrl{-1} & \gate{H} & \meter{} & \ctrl{1} &          & \\
+                                 & \qw       & \qw      & \qw      & \gate{Z} & \gate{X} & \rstick{\ket{\psi}}\qw
+\end{quantikz}
 
 \section{Basic definitions}
 
