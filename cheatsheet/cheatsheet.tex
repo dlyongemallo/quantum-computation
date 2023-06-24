@@ -28,12 +28,12 @@
 
 \section{Teleportation}
 
-% TODO: set wire type to classical, annotate measurement outcomes.
+% TODO: annotate measurement outcomes, upgrade to quantikz2.
 
 \begin{quantikz}
-    \lstick{\ket{\psi}}          & \targ{}   & \qw      & \meter{} & \qw      & \ctrl{2} & \\
-    \lstick[2]{\ket{\beta_{00}}} & \ctrl{-1} & \gate{H} & \meter{} & \ctrl{1} &          & \\
-                                 & \qw       & \qw      & \qw      & \gate{Z} & \gate{X} & \rstick{\ket{\psi}}\qw
+    \lstick{\ket{\psi}}          & \ctrl{1} & \gate{H} & \meter{} & \cw        & \cwbend{2} & \\
+    \lstick[2]{\ket{\beta_{00}}} & \targ{}  & \qw      & \meter{} & \cwbend{1} &          & \\
+                                 & \qw      & \qw      & \qw      & \gate{X}   & \gate{Z} & \rstick{\ket{\psi}}\qw
 \end{quantikz}
 
 \section{Basic definitions}

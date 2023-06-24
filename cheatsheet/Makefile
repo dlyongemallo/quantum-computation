@@ -6,7 +6,7 @@ $(FILENAME).pdf : $(FILENAME).tex
 	pdflatex $(FILENAME)
 
 edit :
-	gvim $(FILENAME).tex
+	vim $(FILENAME).tex
 
 spell :
 	ispell -t $(FILENAME).tex
