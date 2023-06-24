@@ -2,7 +2,7 @@
 \usepackage{bbm}
 \usepackage{listings}
 \usepackage{tikz}
-\usetikzlibrary{quantikz}
+\usetikzlibrary{quantikz2}
 \usetikzlibrary{zx-calculus}
 
 % This uses the class: https://ctan.org/pkg/cheatsheet
@@ -20,21 +20,17 @@
 
 \maketitle
 
-\section{ZX Calculus}
+\section{Teleportation}
+
+\begin{quantikz}
+    \lstick{\ket{\psi}}          & \ctrl{1} & \gate{H} & \meter{} & \setwiretype{c}           & \cwbend{2}\setwiretype{n} \\
+    \lstick[2]{\ket{\beta_{00}}} & \targ{}  &          & \meter{} & \cwbend{1}\setwiretype{n} \\
+                                 &          &          &          & \gate{X}                  & \gate{Z} & \rstick{\ket{\psi}}
+\end{quantikz}
 
 \begin{ZX}
   \zxZ{\alpha} \arrow[r] & \zxFracX-{\pi}{4}
 \end{ZX}
-
-\section{Teleportation}
-
-% TODO: annotate measurement outcomes, upgrade to quantikz2.
-
-\begin{quantikz}
-    \lstick{\ket{\psi}}          & \ctrl{1} & \gate{H} & \meter{} & \cw        & \cwbend{2} & \\
-    \lstick[2]{\ket{\beta_{00}}} & \targ{}  & \qw      & \meter{} & \cwbend{1} &          & \\
-                                 & \qw      & \qw      & \qw      & \gate{X}   & \gate{Z} & \rstick{\ket{\psi}}\qw
-\end{quantikz}
 
 \section{Basic definitions}
 
@@ -159,7 +155,7 @@ The Quantum Approximation Optimization Algorithm is...
 % \end{lstlisting}
 
 % \section{Installing packages from CTAN on macOS}
-% 
+%
 % \begin{lstlisting}
 % tlmgr install quantikz
 % \end{lstlisting}
