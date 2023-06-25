@@ -2,8 +2,12 @@
 \usepackage{bbm}
 \usepackage{listings}
 \usepackage{tikz}
-\usetikzlibrary{quantikz2}
 \usetikzlibrary{zx-calculus}
+\usetikzlibrary{quantikz2}
+
+% This is needed because of a clash between the quantikz and zx-calculus libraries.
+% https://tex.stackexchange.com/questions/689265/how-do-i-use-both-quantikz-and-zx-calculus-packages
+\AddToHook{env/ZX/begin}{\tikzcdset{every cell/.style={}}}
 
 % This uses the class: https://ctan.org/pkg/cheatsheet
 % Download and run "latex cheatsheet.ins".
@@ -20,6 +24,10 @@
 
 \maketitle
 
+\section{ZX-Calculus}
+
+$\zx{\leftManyDots{m} \zxZ{\alpha} \rightManyDots{n}} := \underbrace{\ket{0 \cdots 0}}_{n}\underbrace{\bra{0 \cdots 0}}_{m} + e^{i\alpha}\underbrace{\ket{1 \cdots 1}}_{n}\underbrace{\bra{1 \cdots 1}}_{m}$
+
 \section{Teleportation}
 
 \begin{quantikz}
@@ -28,9 +36,6 @@
                                  &          &          &          & \gate{X}                  & \gate{Z} & \rstick{\ket{\psi}}
 \end{quantikz}
 
-\begin{ZX}
-  \zxZ{\alpha} \arrow[r] & \zxFracX-{\pi}{4}
-\end{ZX}
 
 \section{Basic definitions}
 
