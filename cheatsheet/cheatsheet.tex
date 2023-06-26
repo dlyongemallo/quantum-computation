@@ -28,6 +28,29 @@
 
 $\zx{\leftManyDots{m} \zxZ{\alpha} \rightManyDots{n}} := \underbrace{\ket{0 \cdots 0}}_{n}\underbrace{\bra{0 \cdots 0}}_{m} + e^{i\alpha}\underbrace{\ket{1 \cdots 1}}_{n}\underbrace{\bra{1 \cdots 1}}_{m}$
 
+$\zx{\leftManyDots{m} \zxX{\alpha} \rightManyDots{n}} := \underbrace{\ket{+ \cdots +}}_{n}\underbrace{\bra{+ \cdots +}}_{m} + e^{i\alpha}\underbrace{\ket{- \cdots -}}_{n}\underbrace{\bra{- \cdots -}}_{m}$
+
+$\zx{\zxN{} \arrow[r] & \zxZ{\alpha} \arrow[r] & \zxN{}} :=
+\begin{bmatrix}
+1 & 0 \\
+0 & e^{i\alpha} \\
+\end{bmatrix}$
+$\zx{\zxN{} \arrow[r] & \zxX{\alpha} \arrow[r] & \zxN{}} :=
+\frac{1}{2}
+\begin{bmatrix}
+1 + e^{i\alpha} & 1 - e^{i\alpha} \\
+1 - e^{i\alpha} & 1 + e^{i\alpha} \\
+\end{bmatrix}$
+
+$\zx{\zxN{} \arrow[r] & \zxZ{\pi} \arrow[r] & \zxN{}} := \begin{quantikz}&\gate{Z}&\end{quantikz}$
+$\zx{\zxN{} \arrow[r] & \zxX{\pi} \arrow[r] & \zxN{}} := \begin{quantikz}&\gate{X}&\end{quantikz}$
+
+$\zx{\zxZ{} \arrow[r] & \zxN{}} := \sqrt{2}\ket{0}$
+$\zx{\zxZ{\pi} \arrow[r] & \zxN{}} := \sqrt{2}\ket{1}$
+
+$\zx{\zxX{} \arrow[r] & \zxN{}} := \sqrt{2}\ket{+}$
+$\zx{\zxX{\pi} \arrow[r] & \zxN{}} := \sqrt{2}\ket{-}$
+
 \section{Teleportation}
 
 \begin{quantikz}
