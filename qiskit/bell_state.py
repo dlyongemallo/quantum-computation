@@ -7,21 +7,19 @@ from qiskit import(
     QuantumCircuit,
     QuantumRegister,
     ClassicalRegister,
-    execute, IBMQ, Aer)
+    execute, Aer)
 from qiskit_ibm_provider import IBMProvider, least_busy
 
 # Set to true to use an actual device.
 use_device = False
 if use_device:
-    # TODO: This uses the deprecated IBMQ credentials code and needs to be updated.
-    IBMQ.load_account()
-    provider = IBMQ.get_provider(hub='ibm-q')
+    provider = IBMProvider(instance='ibm-q/open/main')
     device = least_busy(provider.backends(
         filters=lambda x: x.configuration().n_qubits >= 2 and
         not x.configuration().simulator and x.status().operational==True))
     print("Using backend: ", device)
 else:
-    device = IBMProvider().get_backend('ibmq_qasm_simulator')
+    device = Aer.get_backend('qasm_simulator')
 
 # Init 2 qubits and 2 classical bits.
 q = QuantumRegister(2)

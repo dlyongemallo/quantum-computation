@@ -2,7 +2,6 @@
 
 from qiskit import QuantumCircuit, transpile
 from qiskit_aer import AerSimulator
-from qiskit.visualization import plot_histogram
 
 # Use Aer's AerSimulator
 simulator = AerSimulator()

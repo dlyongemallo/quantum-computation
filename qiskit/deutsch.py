@@ -10,16 +10,14 @@ from qiskit import(
     QuantumCircuit,
     QuantumRegister,
     ClassicalRegister,
-    execute, IBMQ, Aer)
-from qiskit.providers.ibmq import least_busy
-from qiskit.extensions import CnotGate, XGate
+    execute, Aer)
+from qiskit_ibm_provider import IBMProvider, least_busy
 import random
 
 # Set to true to use an actual device.
 use_device = False
 if use_device:
-    IBMQ.load_account()
-    provider = IBMQ.get_provider(hub='ibm-q')
+    provider = IBMProvider(instance='ibm-q/open/main')
     device = least_busy(provider.backends(
         filters=lambda x: x.configuration().n_qubits >= 2 and
         not x.configuration().simulator and x.status().operational==True))
