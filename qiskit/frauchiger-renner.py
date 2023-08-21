@@ -7,9 +7,8 @@ from qiskit import(
     QuantumCircuit,
     QuantumRegister,
     ClassicalRegister,
-    execute, IBMQ, Aer)
-from qiskit.providers.ibmq import least_busy
-from qiskit.providers.ibmq.job.exceptions import IBMQJobFailureError
+    execute, Aer)
+from qiskit_ibm_provider import IBMProvider, least_busy
 import math
 import numpy as np
 
@@ -17,8 +16,7 @@ import numpy as np
 use_device = False
 simulator = Aer.get_backend('statevector_simulator')
 if use_device:
-    IBMQ.load_account()
-    provider = IBMQ.get_provider(hub='ibm-q')
+    provider = IBMProvider(instance='ibm-q/open/main')
     device = least_busy(provider.backends(
         filters=lambda x: x.configuration().n_qubits >= 6 and
         not x.configuration().simulator and x.status().operational==True))
