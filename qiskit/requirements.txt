@@ -3,3 +3,4 @@ qiskit_aer==0.12.2
 matplotlib==3.7.2
 pylatexenc==2.1.0
 qiskit-ibm-provider==0.6.3
+qiskit-optimization==0.5.0
