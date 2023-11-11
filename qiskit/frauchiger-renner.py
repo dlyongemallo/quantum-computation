@@ -59,8 +59,8 @@ print("\nState vector (RASB) is:\n", np.vstack(labeled_statevector))
 qc.cx(r, alice)
 qc.h(r)
 qc.cx(r, ursula)
-# qc.h(r)
-# qc.cx(r, alice)
+# qc.h(r)          # for symmetry
+# qc.cx(r, alice)  # for symmetry
 qc.barrier()
 
 # Wigner measures Bob's lab (S + B) in the basis
@@ -69,8 +69,8 @@ qc.barrier()
 qc.cx(s, bob)
 qc.h(s)
 qc.cx(s, wigner)
-# qc.h(s)
-# qc.cx(s, bob)
+# qc.h(s)        # for symmetry
+# qc.cx(s, bob)  # for symmetry
 qc.barrier()
 
 # Measure Ursula and Wigner's qubits.
