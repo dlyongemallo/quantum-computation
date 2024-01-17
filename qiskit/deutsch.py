@@ -11,6 +11,7 @@ from qiskit import(
     QuantumRegister,
     ClassicalRegister,
     execute, Aer)
+from qiskit.qasm3 import dumps
 from qiskit_ibm_provider import IBMProvider, least_busy
 import random
 
@@ -58,3 +59,7 @@ job = execute(circuit, device, shots=1024)
 result = job.result()
 counts = result.get_counts(circuit)
 print("\nTotal counts are:", dict(sorted(counts.items())))
+
+# Output QASM
+print(circuit.qasm())
+print(dumps(circuit))

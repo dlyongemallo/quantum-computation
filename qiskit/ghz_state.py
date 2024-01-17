@@ -8,6 +8,7 @@ from qiskit import(
     QuantumRegister,
     ClassicalRegister,
     execute, IBMQ, Aer)
+from qiskit.qasm3 import dumps
 
 # Set to true to use an actual device.
 use_device = False
@@ -40,3 +41,7 @@ job = execute(circuit, device, shots=1024)
 result = job.result()
 counts = result.get_counts(circuit)
 print("\nTotal counts are:", dict(sorted(counts.items())))
+
+# Output QASM
+print(circuit.qasm())
+print(dumps(circuit))
