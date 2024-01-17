@@ -7,9 +7,10 @@ from qiskit import(
     QuantumCircuit,
     QuantumRegister,
     ClassicalRegister,
-    execute, IBMQ, Aer)
+    execute, IBMQ, Aer, transpile)
 from qiskit.qasm3 import dumps
 from qiskit.quantum_info.operators import Operator
+from qiskit.circuit.library.standard_gates import get_standard_gate_name_mapping
 from math import sqrt
 
 # Set to true to use an actual device.
@@ -44,7 +45,11 @@ result = job.result()
 counts = result.get_counts(circuit)
 print("\nTotal counts are:", dict(sorted(counts.items())))
 
-# Output QASM
-# Note: This fails because of qiskit issue #11558.
+# Output QASM2
 print(circuit.qasm())
-print(dumps(circuit))
+
+# Output QASM3
+# Note: This requires a workaround because of qiskit issue #11558.
+# print(dumps(circuit))
+basis_gates = list(get_standard_gate_name_mapping())
+print(dumps(transpile(circuit, basis_gates=basis_gates, optimization_level=0)))
