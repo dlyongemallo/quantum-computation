@@ -8,6 +8,7 @@ from qiskit import(
     QuantumRegister,
     ClassicalRegister,
     execute, IBMQ, Aer)
+from qiskit.qasm3 import dumps
 from qiskit.quantum_info.operators import Operator
 from math import sqrt
 
@@ -42,3 +43,8 @@ job = execute(circuit, device, shots=1024)
 result = job.result()
 counts = result.get_counts(circuit)
 print("\nTotal counts are:", dict(sorted(counts.items())))
+
+# Output QASM
+# Note: This fails because of qiskit issue #11558.
+print(circuit.qasm())
+print(dumps(circuit))
