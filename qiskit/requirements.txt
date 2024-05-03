@@ -1,6 +1,5 @@
-qiskit==0.44.1
-qiskit_aer==0.12.2
+qiskit~=1.0.2
 matplotlib==3.7.2
 pylatexenc==2.1.0
-qiskit-ibm-provider~=0.7.0
-qiskit-optimization==0.5.0
+qiskit-zx-transpiler==0.0.1
+pyzx>=0.8.0
