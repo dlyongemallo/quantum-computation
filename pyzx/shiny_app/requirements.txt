@@ -1,0 +1,6 @@
+shiny
+shinyswatch
+qiskit
+matplotlib
+pylatexenc
+pyzx @ git+https://github.com/dlyongemallo/pyzx.git@d80022c7514d0c764af81efc8dbce00a5a12bea1
