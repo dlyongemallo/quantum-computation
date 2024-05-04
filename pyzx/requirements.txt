@@ -1,1 +1,5 @@
-pyzx>=0.7.3
+pyzx~=0.8.0
+qiskit~=1.0.2
+matplotlib
+pylatexenc
+streamlit
